@@ -25,7 +25,6 @@ import app.revanced.integrations.utils.StringRef;
 public enum SettingsEnum {
 
     // Ads
-    HIDE_GENERAL_ADS("revanced_hide_general_ads", BOOLEAN, TRUE),
     HIDE_GET_PREMIUM("revanced_hide_get_premium", BOOLEAN, TRUE, true),
     HIDE_IMAGE_SHELF("revanced_hide_image_shelf", BOOLEAN, TRUE),
     HIDE_MERCHANDISE_SHELF("revanced_hide_merchandise_shelf", BOOLEAN, TRUE),
