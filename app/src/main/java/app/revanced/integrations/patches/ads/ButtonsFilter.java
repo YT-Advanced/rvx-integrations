@@ -51,10 +51,6 @@ final class ButtonsFilter extends Filter {
                         SettingsEnum.HIDE_REWARDS_BUTTON,
                         "account_link_button"
                 ),
-                new StringFilterGroup(
-                        SettingsEnum.HIDE_ACTION_BUTTON,
-                        "|video_action_button.eml|"
-                ),
                 bufferFilterPathRule
         );
 
