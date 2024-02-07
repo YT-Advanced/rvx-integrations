@@ -4,6 +4,7 @@ import static app.revanced.integrations.youtube.patches.misc.requests.PlayerRout
 import static app.revanced.integrations.youtube.patches.misc.requests.PlayerRoutes.GET_STORYBOARD_SPEC_RENDERER;
 import static app.revanced.integrations.youtube.patches.misc.requests.PlayerRoutes.TV_EMBED_INNER_TUBE_BODY;
 import static app.revanced.integrations.youtube.patches.misc.requests.PlayerRoutes.WEB_INNER_TUBE_BODY;
+import static app.revanced.integrations.youtube.utils.StringRef.str;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -57,14 +58,14 @@ public class StoryboardRendererRequester {
             if (responseCode == 200) return Requester.parseJSONObject(connection);
 
             // Always show a toast for this, as a non 200 response means something is broken.
-            handleConnectionError("Spoof storyboard not available: " + responseCode,
+            handleConnectionError(str("revanced_spoof_failure_connection_status_code" + responseCode),
                     null, showToastOnIOException);
             connection.disconnect();
         } catch (SocketTimeoutException ex) {
-            handleConnectionError("Spoof storyboard temporarily not available (API timed out)",
+            handleConnectionError((str("revanced_spoof_failure_connection_timeout")),
                     ex, showToastOnIOException);
         } catch (IOException ex) {
-            handleConnectionError("Spoof storyboard temporarily not available: " + ex.getMessage(),
+            handleConnectionError((str("revanced_spoof_failure_generic" + ex.getMessage())),
                     ex, showToastOnIOException);
         } catch (Exception ex) {
             LogHelper.printException(() -> "Spoof storyboard fetch failed", ex); // Should never happen.
