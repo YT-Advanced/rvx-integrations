@@ -15,7 +15,7 @@ import app.revanced.integrations.youtube.settings.SettingsEnum;
 public class ReVancedHelper {
     public static String applicationLabel = "ReVanced_Extended";
     public static boolean isTablet = false;
-    public static String packageName = "app.rvx.android.youtube";
+    public static String packageName = "app.revanced.android.youtube";
     public static String appVersionName = "18.45.43";
 
     private ReVancedHelper() {
