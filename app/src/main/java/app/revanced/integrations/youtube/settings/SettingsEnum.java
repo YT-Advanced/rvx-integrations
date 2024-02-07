@@ -289,7 +289,7 @@ public enum SettingsEnum {
 
 
     // Player
-    CUSTOM_PLAYER_OVERLAY_OPACITY("revanced_custom_player_overlay_opacity", INTEGER, 100, true),
+    CUSTOM_PLAYER_OVERLAY_OPACITY("revanced_custom_player_overlay_opacity", INTEGER, 0, true),
     DISABLE_SPEED_OVERLAY("revanced_disable_speed_overlay", BOOLEAN, FALSE, true),
     HIDE_AUDIO_TRACK_BUTTON("revanced_hide_audio_track_button", BOOLEAN, TRUE),
     HIDE_AUTOPLAY_BUTTON("revanced_hide_autoplay_button", BOOLEAN, TRUE, true),
@@ -323,8 +323,8 @@ public enum SettingsEnum {
     // Seekbar
     APPEND_TIME_STAMP_INFORMATION("revanced_append_time_stamp_information", BOOLEAN, TRUE),
     APPEND_TIME_STAMP_INFORMATION_TYPE("revanced_append_time_stamp_information_type", BOOLEAN, TRUE),
-    ENABLE_CUSTOM_SEEKBAR_COLOR("revanced_enable_custom_seekbar_color", BOOLEAN, TRUE, true),
-    ENABLE_CUSTOM_SEEKBAR_COLOR_VALUE("revanced_custom_seekbar_color_value", STRING, "#ff0000", true,
+    ENABLE_CUSTOM_SEEKBAR_COLOR("revanced_enable_custom_seekbar_color", BOOLEAN, FALSE, true),
+    ENABLE_CUSTOM_SEEKBAR_COLOR_VALUE("revanced_custom_seekbar_color_value", STRING, "#ffff0000", true,
             parents(ENABLE_CUSTOM_SEEKBAR_COLOR)),
     ENABLE_SEEKBAR_TAPPING("revanced_enable_seekbar_tapping", BOOLEAN, TRUE),
     ENABLE_NEW_THUMBNAIL_PREVIEW("revanced_enable_new_thumbnail_preview", BOOLEAN, FALSE, true),
