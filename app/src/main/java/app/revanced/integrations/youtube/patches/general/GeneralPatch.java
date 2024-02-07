@@ -2,6 +2,7 @@ package app.revanced.integrations.youtube.patches.general;
 
 import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewBy0dpUnderCondition;
 import static app.revanced.integrations.youtube.utils.ReVancedUtils.hideViewUnderCondition;
+import static app.revanced.integrations.youtube.utils.ResourceUtils.identifier;
 import static app.revanced.integrations.youtube.utils.StringRef.str;
 
 import android.app.AlertDialog;
@@ -23,6 +24,7 @@ import java.util.Objects;
 
 import app.revanced.integrations.youtube.settings.SettingsEnum;
 import app.revanced.integrations.youtube.utils.LogHelper;
+import app.revanced.integrations.youtube.utils.ResourceType;
 import app.revanced.integrations.youtube.utils.ReVancedUtils;
 
 /**
@@ -36,6 +38,7 @@ public class GeneralPatch {
             "FAB_CAMERA",       // Create button (Tablet)
             "TAB_ACTIVITY"      // Notification button
     };
+    private static final String PREMIUM_HEADER_NAME = "ytPremiumWordmarkHeader";
     private static FrameLayout.LayoutParams layoutParams;
     @NonNull
     private static String videoId = "";
@@ -136,6 +139,13 @@ public class GeneralPatch {
 
     public static boolean enableGradientLoadingScreen() {
         return SettingsEnum.ENABLE_GRADIENT_LOADING_SCREEN.getBoolean();
+    }
+
+    public static int enablePremiumHeader(int originalValue) {
+        if (SettingsEnum.ENABLE_PREMIUM_HEADER.getBoolean())
+            return identifier(PREMIUM_HEADER_NAME, ResourceType.ATTR);
+
+        return originalValue;
     }
 
     public static boolean enableSongSearch() {

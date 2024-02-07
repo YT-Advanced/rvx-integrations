@@ -156,6 +156,7 @@ public enum SettingsEnum {
     DISABLE_AUTO_CAPTIONS("revanced_disable_auto_captions", BOOLEAN, FALSE, true),
     DISABLE_ROLLING_NUMBER_ANIMATIONS("revanced_disable_rolling_number_animations", BOOLEAN, FALSE, true),
     ENABLE_GRADIENT_LOADING_SCREEN("revanced_enable_gradient_loading_screen", BOOLEAN, FALSE, true),
+    ENABLE_PREMIUM_HEADER("revanced_override_premium_header", BOOLEAN, FALSE, true),
     ENABLE_SONG_SEARCH("revanced_enable_song_search", BOOLEAN, TRUE, true),
     ENABLE_TABLET_MINI_PLAYER("revanced_enable_tablet_mini_player", BOOLEAN, FALSE, true),
     ENABLE_WIDE_SEARCH_BAR("revanced_enable_wide_search_bar", BOOLEAN, FALSE, true),
