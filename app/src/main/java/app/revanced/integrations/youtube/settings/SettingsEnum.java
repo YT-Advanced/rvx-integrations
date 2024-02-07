@@ -299,7 +299,7 @@ public enum SettingsEnum {
     HIDE_END_SCREEN_CARDS("revanced_hide_end_screen_cards", BOOLEAN, FALSE, true),
     HIDE_INFO_CARDS("revanced_hide_info_cards", BOOLEAN, FALSE, true),
     HIDE_PLAYER_BUTTON_BACKGROUND("revanced_hide_player_button_background", BOOLEAN, FALSE, true),
-    HIDE_PREVIOUS_NEXT_BUTTON("revanced_hide_previous_next_button", BOOLEAN, FALSE),
+    HIDE_PREVIOUS_NEXT_BUTTON("revanced_hide_previous_next_button", BOOLEAN, FALSE, true),
     HIDE_SEEK_MESSAGE("revanced_hide_seek_message", BOOLEAN, FALSE, true),
     HIDE_SEEK_UNDO_MESSAGE("revanced_hide_seek_undo_message", BOOLEAN, FALSE, true),
     HIDE_SUGGESTED_ACTION("revanced_hide_suggested_actions", BOOLEAN, TRUE, true),
