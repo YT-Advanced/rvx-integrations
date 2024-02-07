@@ -31,6 +31,17 @@ object ResourceHelper {
         }
 
     @JvmStatic
+    fun hidePlayerButtonBackground(view: View?) {
+        PlayerButton.PLAYER.apply {
+            if (view == null || !settings.boolean) return
+            for (id in filter) {
+                if (view.id == identifier(id, ResourceType.ID))
+                    view.background.alpha = 0
+            }
+        }
+    }
+
+    @JvmStatic
     fun hidePlayerButton(view: View, original: Int): Int {
         PlayerButton.COLLAPSE.apply {
             if (settings.boolean) {
@@ -51,5 +62,16 @@ private enum class PlayerButton(
     COLLAPSE(
         SettingsEnum.HIDE_COLLAPSE_BUTTON,
         listOf("player_collapse_button")
+    ),
+    PLAYER(
+        SettingsEnum.HIDE_PLAYER_BUTTON_BACKGROUND,
+        listOf(
+            "player_control_fast_forward_button",
+            "player_control_next_button",
+            "play_button",
+            "player_control_play_pause_replay_button",
+            "player_control_previous_button",
+            "player_control_rewind_button"
+        )
     );
 }
