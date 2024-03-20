@@ -24,7 +24,8 @@ public final class SuggestionsShelfFilter extends Filter {
         horizontalShelf = new StringFilterGroup(
                 SettingsEnum.HIDE_SUGGESTIONS_SHELF,
                 "horizontal_tile_shelf.eml",
-                "horizontal_video_shelf.eml"
+                "horizontal_video_shelf.eml",
+                "horizontal_shelf.eml"
         );
 
         libraryShelf = new StringFilterGroup(
