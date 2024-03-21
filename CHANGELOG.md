@@ -1,3 +1,10 @@
+## [0.146.6](https://github.com/YT-Advanced/ReX-integrations/compare/v0.146.5...v0.146.6) (2024-03-21)
+
+
+### Bug Fixes
+
+* **YouTube - Hide Suggested Video Overlay:** Shelves is not hidden due to A/B Testing ([855b418](https://github.com/YT-Advanced/ReX-integrations/commit/855b4181ce32bc7df7c87dddfb95c86928f399aa))
+
 ## [0.146.5](https://github.com/YT-Advanced/ReX-integrations/compare/v0.146.4...v0.146.5) (2024-03-16)
 
 
