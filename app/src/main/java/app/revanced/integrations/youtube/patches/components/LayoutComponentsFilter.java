@@ -94,7 +94,8 @@ public final class LayoutComponentsFilter extends Filter {
         );
 
         homeVideoWithContext = new StringFilterGroup(
-                SettingsEnum.HIDE_VIDEO_WITH_LOW_VIEW,
+                SettingsEnum.HIDE_VIDEO_WITH_LOW_VIEW
+                    || SettingsEnum.HIDE_HOME_FEED_MEMBERSHIP_VIDEO,
                 "home_video_with_context.eml"
         );
 

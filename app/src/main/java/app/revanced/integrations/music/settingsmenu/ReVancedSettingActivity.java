@@ -41,19 +41,12 @@ public class ReVancedSettingActivity {
      *                     It should be finished immediately after obtaining the dataString.
      * @return Whether or not dataString is included.
      */
-    public static boolean initializeSettings(@NonNull Activity baseActivity) {
+    public static void initializeSettings(@NonNull Activity baseActivity) {
         try {
             final String dataString = Objects.requireNonNull(baseActivity.getIntent()).getDataString();
 
-            // If we do not finish the activity immediately, the YT Music logo will remain on the screen.
-            baseActivity.finish();
-
-            if (dataString == null || dataString.isEmpty())
-                return false;
-
-            // Checks whether dataString contains settings that use Intent.
-            if (!SettingsEnum.includeWithIntent(dataString))
-                return false;
+            if (dataString == null || dataString.isEmpty() || !SettingsEnum.includeWithIntent(dataString))
+                return;
 
             // Save intent data in settings activity.
             Intent intent = activity.getIntent();
@@ -65,12 +58,9 @@ public class ReVancedSettingActivity {
                     .beginTransaction()
                     .add(new ReVancedSettingsFragment(), "")
                     .commit();
-
-            return true;
         } catch (Exception ex) {
             LogHelper.printException(() -> "initializeSettings failure", ex);
         }
-        return false;
     }
 
 }
