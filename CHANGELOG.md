@@ -1,3 +1,10 @@
+## [0.148.1](https://github.com/YT-Advanced/ReX-integrations/compare/v0.148.0...v0.148.1) (2024-03-26)
+
+
+### Bug Fixes
+
+* Typo ([5608d79](https://github.com/YT-Advanced/ReX-integrations/commit/5608d79f9930633d0405226c74a2d2318b9ec531))
+
 # [0.148.0](https://github.com/YT-Advanced/ReX-integrations/compare/v0.147.0...v0.148.0) (2024-03-26)
 
 
