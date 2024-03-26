@@ -75,6 +75,11 @@ public final class ShortsFilter extends Filter {
                 "sponsor_button"
         );
 
+        final StringFilterGroup reelSoundMetadata = new StringFilterGroup(
+                SettingsEnum.HIDE_SHORTS_PLAYER_SOUND_METADATA_LABEL,
+                "reel_sound_metadata"
+        );
+
         final StringFilterGroup subscribeButton = new StringFilterGroup(
                 SettingsEnum.HIDE_SHORTS_PLAYER_SUBSCRIPTIONS_BUTTON,
                 "shorts_paused_state",
@@ -93,12 +98,25 @@ public final class ShortsFilter extends Filter {
                 "shorts_video_action_button"
         );
 
+        final StringFilterGroup videoLinkLabel = new StringFilterGroup(
+                SettingsEnum.HIDE_SHORTS_PLAYER_VIDEO_LINK_LABEL,
+                "reel_multi_format_link"
+        );
+
+        final StringFilterGroup videoTitle = new StringFilterGroup(
+                SettingsEnum.HIDE_SHORTS_PLAYER_VIDEO_TITLE,
+                "shorts_video_title_item"
+        );
+
         pathFilterGroupList.addAll(
                 shortsCompactFeedVideoPath,
                 joinButton,
+                reelSoundMetadata,
                 subscribeButton,
                 infoPanel,
-                videoActionButton
+                videoActionButton,
+                videoLinkLabel,
+                videoTitle
         );
 
         final ByteArrayAsStringFilterGroup shortsDislikeButton =
