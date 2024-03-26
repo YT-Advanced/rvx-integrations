@@ -18,7 +18,7 @@ public class MicroGPatch {
     private static final String DONT_KILL_MY_APP_LINK = "https://dontkillmyapp.com";
     private static final String MICROG_VENDOR = "app.revanced";
     private static final String MICROG_PACKAGE_NAME = MICROG_VENDOR + ".android.gms";
-    private static final String MICROG_DOWNLOAD_LINK = "https://github.com/YT-Advanced/GmsCore/releases/latest";
+    private static final String MICROG_DOWNLOAD_LINK = "https://github.com/Revanced/GmsCore/releases/latest";
     private static final Uri MICROG_PROVIDER = Uri.parse("content://" + MICROG_VENDOR + ".android.gsf.gservices/prefix");
 
     private static void startIntent(Context context, String uriString, String... message) {
