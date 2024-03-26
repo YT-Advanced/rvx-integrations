@@ -1,3 +1,10 @@
+# [0.148.0](https://github.com/YT-Advanced/ReX-integrations/compare/v0.147.0...v0.148.0) (2024-03-26)
+
+
+### Features
+
+* **MicroG Support:** Use `app.revanced` as default option ([44d3e45](https://github.com/YT-Advanced/ReX-integrations/commit/44d3e45e373cc22c33be3803837ad4ca86bbee0d))
+
 # [0.147.0](https://github.com/YT-Advanced/ReX-integrations/compare/v0.146.6...v0.147.0) (2024-03-26)
 
 
