@@ -1,3 +1,17 @@
+# [0.147.0](https://github.com/YT-Advanced/ReX-integrations/compare/v0.146.6...v0.147.0) (2024-03-26)
+
+
+### Bug Fixes
+
+* **YouTube - Hide interstitial ads:** Prevent app crash if hiding interstitial ads is not possible ([f0e5233](https://github.com/YT-Advanced/ReX-integrations/commit/f0e5233efac510aef2c0f571b43df25c828e5b80))
+
+
+### Features
+
+* **MicroG Support:** Switch to GMS Core ([ceb15f3](https://github.com/YT-Advanced/ReX-integrations/commit/ceb15f3f55a5fe44253361915f65fcc379c8e6e4))
+* **YouTube - Hide Shorts Component:** Add new settings ([f84f72b](https://github.com/YT-Advanced/ReX-integrations/commit/f84f72b1f0acca8162291306cf9dc897631897fd))
+* **YTM:** Support YTM v6.43+ ([2bf44f0](https://github.com/YT-Advanced/ReX-integrations/commit/2bf44f0dc9354bbb1cbaca2a17f764697c2c9341))
+
 ## [0.146.6](https://github.com/YT-Advanced/ReX-integrations/compare/v0.146.5...v0.146.6) (2024-03-21)
 
 
