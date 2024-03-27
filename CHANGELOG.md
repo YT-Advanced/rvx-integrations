@@ -1,3 +1,10 @@
+## [0.148.4](https://github.com/YT-Advanced/ReX-integrations/compare/v0.148.3...v0.148.4) (2024-03-27)
+
+
+### Bug Fixes
+
+* **MicroG Support:** Remove check ([cbe49e5](https://github.com/YT-Advanced/ReX-integrations/commit/cbe49e581a29c0ea6595f3ba9333dd0a78eeb1a7))
+
 ## [0.148.3](https://github.com/YT-Advanced/ReX-integrations/compare/v0.148.2...v0.148.3) (2024-03-27)
 
 
