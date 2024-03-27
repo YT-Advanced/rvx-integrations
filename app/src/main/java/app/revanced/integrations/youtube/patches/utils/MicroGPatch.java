@@ -36,7 +36,7 @@ public class MicroGPatch {
 
     public static void checkAvailability(@NonNull Context context) {
         try {
-            context.getPackageManager().getPackageInfo(YOUTUBE_PACKAGE_NAME, 0);
+            context.getPackageManager().getPackageInfo(YOUTUBE_PACKAGE_NAME, PackageManager.GET_META_DATA);
         } catch (PackageManager.NameNotFoundException exception) {
             LogHelper.printInfo(() -> "Stock YouTube was not found", exception);
             ReVancedUtils.showToastLong("Please reinstall your Stock YouTube from Play Store");
