@@ -18,8 +18,9 @@ public class MicroGPatch {
     private static final String DONT_KILL_MY_APP_LINK = "https://dontkillmyapp.com";
     private static final String MICROG_VENDOR = "app.revanced";
     private static final String MICROG_PACKAGE_NAME = MICROG_VENDOR + ".android.gms";
-    private static final String MICROG_DOWNLOAD_LINK = "https://github.com/Revanced/GmsCore/releases/latest";
+    private static final String MICROG_DOWNLOAD_LINK = "https://github.com/YT-Advanced/GmsCore/releases/latest";
     private static final Uri MICROG_PROVIDER = Uri.parse("content://" + MICROG_VENDOR + ".android.gsf.gservices/prefix");
+    private static final String YOUTUBE_PACKAGE_NAME = "com.google.android.youtube";
 
     private static void startIntent(Context context, String uriString, String... message) {
         for (String string : message) {
@@ -34,6 +35,13 @@ public class MicroGPatch {
     }
 
     public static void checkAvailability(@NonNull Context context) {
+        try {
+            context.getPackageManager().getPackageInfo(YOUTUBE_PACKAGE_NAME, 0);
+        } catch (PackageManager.NameNotFoundException exception) {
+            LogHelper.printInfo(() -> "Stock YouTube was not found", exception);
+            ReVancedUtils.showToastLong("Please reinstall your Stock YouTube from Play Store");
+        }
+
         try {
             context.getPackageManager().getPackageInfo(MICROG_PACKAGE_NAME, PackageManager.GET_ACTIVITIES);
         } catch (PackageManager.NameNotFoundException exception) {
