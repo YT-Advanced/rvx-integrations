@@ -1,3 +1,10 @@
+## [0.148.3](https://github.com/YT-Advanced/ReX-integrations/compare/v0.148.2...v0.148.3) (2024-03-27)
+
+
+### Bug Fixes
+
+* **MicroG Support:** Add stock app package name checking ([16f7871](https://github.com/YT-Advanced/ReX-integrations/commit/16f78711b0ff3245b7478459207a13c56d6d34ef))
+
 ## [0.148.2](https://github.com/YT-Advanced/ReX-integrations/compare/v0.148.1...v0.148.2) (2024-03-27)
 
 
