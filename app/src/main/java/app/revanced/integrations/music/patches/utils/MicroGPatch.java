@@ -20,7 +20,6 @@ public class MicroGPatch {
     private static final String MICROG_PACKAGE_NAME = MICROG_VENDOR + ".android.gms";
     private static final String MICROG_DOWNLOAD_LINK = "https://github.com/YT-Advanced/GmsCore/releases/latest";
     private static final Uri MICROG_PROVIDER = Uri.parse("content://" + MICROG_VENDOR + ".android.gsf.gservices/prefix");
-    private static final String YOUTUBE_MUSIC_PACKAGE_NAME = "com.google.android.apps.youtube.music";
 
     private static void startIntent(Context context, String uriString, String... message) {
         for (String string : message) {
@@ -35,13 +34,6 @@ public class MicroGPatch {
     }
 
     public static void checkAvailability(@NonNull Context context) {
-        try {
-            context.getPackageManager().getPackageInfo(YOUTUBE_MUSIC_PACKAGE_NAME, PackageManager.GET_META_DATA);
-        } catch (PackageManager.NameNotFoundException exception) {
-            LogHelper.printInfo(() -> "Stock YouTube Music was not found", exception);
-            ReVancedUtils.showToastLong("Please install Stock YouTube Music from Play Store");
-        }
-
         try {
             context.getPackageManager().getPackageInfo(MICROG_PACKAGE_NAME, PackageManager.GET_ACTIVITIES);
         } catch (PackageManager.NameNotFoundException exception) {
