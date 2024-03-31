@@ -18,7 +18,7 @@ final class QuickActionFilter extends Filter {
     public QuickActionFilter() {
         quickActionRule = new StringFilterGroup(null, QUICK_ACTION_PATH);
         identifierFilterGroupList.addAll(quickActionRule);
-        bufferFilterPathRule = new StringFilterGroup(null, "|fullscreen_video_action_button.eml|");
+        bufferFilterPathRule = new StringFilterGroup(null, "button.eml|");
 
         pathFilterGroupList.addAll(
                 new StringFilterGroup(
