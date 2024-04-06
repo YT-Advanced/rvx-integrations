@@ -55,15 +55,27 @@ public class ReVancedUtils {
     private ReVancedUtils() {
     } // utility class
 
+    public interface MatchFilter<T> {
+        boolean matches(T object);
+    }
+
     /**
+     * @param searchRecursively If children ViewGroups should also be
+     *                          recursively searched using depth first search.
      * @return The first child view that matches the filter.
      */
     @Nullable
-    public static <T extends View> T getChildView(@NonNull ViewGroup viewGroup, @NonNull MatchFilter filter) {
+    public static <T extends View> T getChildView(@NonNull ViewGroup viewGroup, boolean searchRecursively,
+                                                  @NonNull MatchFilter<View> filter) {
         for (int i = 0, childCount = viewGroup.getChildCount(); i < childCount; i++) {
             View childAt = viewGroup.getChildAt(i);
             if (filter.matches(childAt)) {
                 return (T) childAt;
+            }
+            // Must do recursive after filter check, in case the filter is looking for a ViewGroup.
+            if (searchRecursively && childAt instanceof ViewGroup) {
+                T match = getChildView((ViewGroup) childAt, true, filter);
+                if (match != null) return match;
             }
         }
         return null;
@@ -279,9 +291,5 @@ public class ReVancedUtils {
         public String getName() {
             return name;
         }
-    }
-
-    public interface MatchFilter<T> {
-        boolean matches(T object);
     }
 }

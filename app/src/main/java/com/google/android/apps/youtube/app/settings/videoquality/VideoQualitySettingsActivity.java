@@ -75,13 +75,15 @@ public class VideoQualitySettingsActivity extends Activity {
     }
 
     private void setBackButton(ViewGroup toolBar) {
-        ImageButton imageButton = Objects.requireNonNull(getChildView(toolBar, view -> view instanceof ImageButton));
+        ImageButton imageButton = Objects.requireNonNull(getChildView(toolBar, false, 
+                view -> view instanceof ImageButton));
         imageButton.setOnClickListener(view -> VideoQualitySettingsActivity.this.onBackPressed());
         imageButton.setImageDrawable(getResources().getDrawable(ResourceHelper.getArrow()));
     }
 
     private void setToolbarTitle(ViewGroup toolBar, String toolbarTitleResourceName) {
-        TextView toolbarTextView = Objects.requireNonNull(getChildView(toolBar, view -> view instanceof TextView));
+        TextView toolbarTextView = Objects.requireNonNull(getChildView(toolBar, false,
+                view -> view instanceof TextView));
         toolbarTextView.setText(identifier(toolbarTitleResourceName, ResourceType.STRING));
     }
 }
