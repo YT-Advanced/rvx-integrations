@@ -26,7 +26,12 @@ public class StringRef extends Utils {
      */
     @NonNull
     public static StringRef sfc(@NonNull String id) {
-        return strings.computeIfAbsent(id, StringRef::new);
+        StringRef ref = strings.get(id);
+        if (ref == null) {
+            ref = new StringRef(id);
+            strings.put(id, ref);
+        }
+        return ref;
     }
 
     /**
