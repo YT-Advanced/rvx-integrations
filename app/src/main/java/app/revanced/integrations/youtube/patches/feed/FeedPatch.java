@@ -78,6 +78,10 @@ public class FeedPatch {
         );
     }
 
+    public static boolean hideFloatingButton() {
+        return Settings.HIDE_FLOATING_BUTTON.get();
+    }
+
     public static void hideLatestVideosButton(View view) {
         hideViewUnderCondition(Settings.HIDE_LATEST_VIDEOS_BUTTON.get(), view);
     }
