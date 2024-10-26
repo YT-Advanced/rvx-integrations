@@ -22,8 +22,12 @@ import app.revanced.integrations.youtube.utils.VideoUtils;
 public class CustomPlaybackSpeedPatch {
     /**
      * Maximum playback speed, exclusive value.  Custom speeds must be less than this value.
+     * <p>
+     * Going over 8x does not increase the actual playback speed any higher,
+     * and the UI selector starts flickering and acting weird.
+     * Over 10x and the speeds show up out of order in the UI selector.
      */
-    private static final float MAXIMUM_PLAYBACK_SPEED = 8;
+    public static final float MAXIMUM_PLAYBACK_SPEED = 8;
     private static final String[] defaultSpeedEntries;
     private static final String[] defaultSpeedEntryValues;
     /**
@@ -45,7 +49,7 @@ public class CustomPlaybackSpeedPatch {
         defaultSpeedEntries = new String[]{getString("quality_auto"), "0.25x", "0.5x", "0.75x", getString("revanced_playback_speed_normal"), "1.25x", "1.5x", "1.75x", "2.0x"};
         defaultSpeedEntryValues = new String[]{"-2.0", "0.25", "0.5", "0.75", "1.0", "1.25", "1.5", "1.75", "2.0"};
 
-        loadSpeeds();
+        loadCustomSpeeds();
     }
 
     /**
@@ -105,9 +109,11 @@ public class CustomPlaybackSpeedPatch {
         Settings.CUSTOM_PLAYBACK_SPEEDS.resetToDefault();
     }
 
-    private static void loadSpeeds() {
+    private static void loadCustomSpeeds() {
         try {
-            if (!Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get()) return;
+            if (!Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get()) {
+                return;
+            }
 
             String[] speedStrings = Settings.CUSTOM_PLAYBACK_SPEEDS.get().split("\\s+");
             Arrays.sort(speedStrings);
@@ -115,17 +121,21 @@ public class CustomPlaybackSpeedPatch {
                 throw new IllegalArgumentException();
             }
             playbackSpeeds = new float[speedStrings.length];
-            for (int i = 0, length = speedStrings.length; i < length; i++) {
-                final float speed = Float.parseFloat(speedStrings[i]);
-                if (speed <= 0 || arrayContains(playbackSpeeds, speed)) {
+            int i = 0;
+            for (String speedString : speedStrings) {
+                final float speedFloat = Float.parseFloat(speedString);
+                if (speedFloat <= 0 || arrayContains(playbackSpeeds, speedFloat)) {
                     throw new IllegalArgumentException();
                 }
-                if (speed > MAXIMUM_PLAYBACK_SPEED) {
-                    resetCustomSpeeds(str("revanced_custom_playback_speeds_invalid", MAXIMUM_PLAYBACK_SPEED + ""));
-                    loadSpeeds();
+
+                if (speedFloat > MAXIMUM_PLAYBACK_SPEED) {
+                    resetCustomSpeeds(str("revanced_custom_playback_speeds_invalid", MAXIMUM_PLAYBACK_SPEED));
+                    loadCustomSpeeds();
                     return;
                 }
-                playbackSpeeds[i] = speed;
+
+                playbackSpeeds[i] = speedFloat;
+                i++;
             }
 
             if (customSpeedEntries != null) return;
@@ -135,7 +145,7 @@ public class CustomPlaybackSpeedPatch {
             customSpeedEntries[0] = getString("quality_auto");
             customSpeedEntryValues[0] = "-2.0";
 
-            int i = 1;
+            i = 1;
             for (float speed : playbackSpeeds) {
                 String speedString = String.valueOf(speed);
                 customSpeedEntries[i] = speed != 1.0f
@@ -147,7 +157,7 @@ public class CustomPlaybackSpeedPatch {
         } catch (Exception ex) {
             Logger.printInfo(() -> "parse error", ex);
             resetCustomSpeeds(str("revanced_custom_playback_speeds_parse_exception"));
-            loadSpeeds();
+            loadCustomSpeeds();
         }
     }
 
@@ -165,52 +175,68 @@ public class CustomPlaybackSpeedPatch {
     /**
      * Injection point.
      */
-    public static void onFlyoutMenuCreate(final RecyclerView recyclerView) {
-        if (!Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get())
+    public static void onFlyoutMenuCreate(RecyclerView recyclerView) {
+        if (!Settings.ENABLE_CUSTOM_PLAYBACK_SPEED.get()) {
             return;
+        }
 
         recyclerView.getViewTreeObserver().addOnDrawListener(() -> {
             try {
-                // Check if the current view is the playback speed menu.
-                if (!PlaybackSpeedMenuFilter.isPlaybackSpeedMenuVisible || recyclerView.getChildCount() == 0) {
+                if (PlaybackSpeedMenuFilter.isOldPlaybackSpeedMenuVisible) {
+                    if (hideLithoMenuAndShowOldSpeedMenu(recyclerView, 8)) {
+                        PlaybackSpeedMenuFilter.isOldPlaybackSpeedMenuVisible = false;
+                    }
                     return;
                 }
-
-                if (!(recyclerView.getChildAt(0) instanceof ViewGroup playbackSpeedParentView)) {
-                    return;
-                }
-
-                // For some reason, the custom playback speed flyout panel is activated when the user opens the share panel. (A/B tests)
-                // Check the child count of playback speed flyout panel to prevent this issue.
-                // Child count of playback speed flyout panel is always 8.
-                if (playbackSpeedParentView.getChildCount() != 8) {
-                    return;
-                }
-
-                PlaybackSpeedMenuFilter.isPlaybackSpeedMenuVisible = false;
-
-                if (!(Utils.getParentView(recyclerView, 3) instanceof ViewGroup parentView3rd)) {
-                    return;
-                }
-
-                if (!(parentView3rd.getParent() instanceof ViewGroup parentView4th)) {
-                    return;
-                }
-
-                // Dismiss View [R.id.touch_outside] is the 1st ChildView of the 4th ParentView.
-                // This only shows in phone layout
-                Utils.clickView(parentView4th.getChildAt(0));
-
-                // In tablet layout, there is no Dismiss View, instead we just hide all two parent views.
-                parentView3rd.setVisibility(View.GONE);
-                parentView4th.setVisibility(View.GONE);
-
-                // Show custom playback speed menu.
-                showCustomPlaybackSpeedMenu(recyclerView.getContext());
             } catch (Exception ex) {
-                Logger.printException(() -> "onFlyoutMenuCreate failure", ex);
+                Logger.printException(() -> "isOldPlaybackSpeedMenuVisible failure", ex);
+            }
+
+            try {
+                if (PlaybackSpeedMenuFilter.isPlaybackRateSelectorMenuVisible) {
+                    if (hideLithoMenuAndShowOldSpeedMenu(recyclerView, 5)) {
+                        PlaybackSpeedMenuFilter.isPlaybackRateSelectorMenuVisible = false;
+                    }
+                }
+            } catch (Exception ex) {
+                Logger.printException(() -> "isPlaybackRateSelectorMenuVisible failure", ex);
             }
         });
+    }
+
+    private static boolean hideLithoMenuAndShowOldSpeedMenu(RecyclerView recyclerView, int expectedChildCount) {
+        if (recyclerView.getChildCount() == 0) {
+            return false;
+        }
+
+        if (!(recyclerView.getChildAt(0) instanceof ViewGroup PlaybackSpeedParentView)) {
+            return false;
+        }
+
+        if (PlaybackSpeedParentView.getChildCount() != expectedChildCount) {
+            return false;
+        }
+
+        if (!(Utils.getParentView(recyclerView, 3) instanceof ViewGroup parentView3rd)) {
+            return false;
+        }
+
+        if (!(parentView3rd.getParent() instanceof ViewGroup parentView4th)) {
+            return false;
+        }
+
+        // Dismiss View [R.id.touch_outside] is the 1st ChildView of the 4th ParentView.
+        // This only shows in phone layout.
+        Utils.clickView(parentView4th.getChildAt(0));
+
+        // In tablet layout there is no Dismiss View, instead we just hide all two parent views.
+        parentView3rd.setVisibility(View.GONE);
+        parentView4th.setVisibility(View.GONE);
+
+        // Show old playback speed menu.
+        showCustomPlaybackSpeedMenu(recyclerView.getContext());
+
+        return true;
     }
 
     /**
