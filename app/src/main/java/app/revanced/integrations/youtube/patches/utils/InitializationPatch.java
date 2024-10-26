@@ -31,7 +31,6 @@ public class InitializationPatch {
         if (SETTINGS_INITIALIZED.get()) {
             return;
         }
-        showSpoofAppVersionDialog(mActivity);
         runOnMainThreadDelayed(() -> {
             if (hasRollingNumberIssue) {
                 showSpoofAppVersionDialog(mActivity);
