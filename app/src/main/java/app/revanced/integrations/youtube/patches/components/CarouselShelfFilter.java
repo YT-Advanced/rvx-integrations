@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
 import app.revanced.integrations.youtube.shared.RootView;
 
 @SuppressWarnings("unused")
@@ -31,28 +32,19 @@ public final class CarouselShelfFilter extends Filter {
             BROWSE_ID_NOTIFICATION_INBOX
     );
 
-    public final StringFilterGroup horizontalShelf;
-
     public CarouselShelfFilter() {
-        final StringFilterGroup carouselShelf = new StringFilterGroup(
-                Settings.HIDE_CAROUSEL_SHELF,
-                "horizontal_shelf_inline.eml",
-                "horizontal_tile_shelf.eml",
-                "horizontal_video_shelf.eml"
-        );
-
-        horizontalShelf = new StringFilterGroup(
-                Settings.HIDE_CAROUSEL_SHELF,
-                "horizontal_shelf.eml"
-        );
-
-        addIdentifierCallbacks(
-                carouselShelf,
-                horizontalShelf
+        addPathCallbacks(
+                new StringFilterGroup(
+                        Settings.HIDE_CAROUSEL_SHELF,
+                        "horizontal_video_shelf.eml",
+                        "horizontal_shelf.eml",
+                        "horizontal_shelf_inline.eml",
+                        "horizontal_tile_shelf.eml"
+                )
         );
     }
 
-    private static boolean hideShelves() {
+    private static boolean hideShelves(NavigationButton selectedNavButton, String browseId) {
         // Must check player type first, as search bar can be active behind the player.
         if (RootView.isPlayerActive()) {
             return false;
@@ -61,7 +53,10 @@ public final class CarouselShelfFilter extends Filter {
         if (RootView.isSearchBarActive()) {
             return true;
         }
-        String browseId = RootView.getBrowseId();
+        // Unknown tab, treat the same as home.
+        if (selectedNavButton == null) {
+            return true;
+        }
         if (knownBrowseId.get().anyMatch(browseId::equals)) {
             return true;
         }
@@ -71,10 +66,10 @@ public final class CarouselShelfFilter extends Filter {
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                               StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
-        if (matchedGroup == horizontalShelf && !hideShelves()) {
-            return false;
+        if (contentIndex == 0 && hideShelves(NavigationButton.getSelectedNavigationButton(), RootView.getBrowseId())) {
+            return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
         }
 
-        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+        return false;
     }
 }
