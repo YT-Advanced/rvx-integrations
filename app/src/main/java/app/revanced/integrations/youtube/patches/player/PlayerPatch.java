@@ -687,6 +687,10 @@ public class PlayerPatch {
         return Settings.ENABLE_SEEKBAR_TAPPING.get();
     }
 
+    public static boolean enableHighQualityFullscreenThumbnails() {
+        return Settings.RESTORE_OLD_SEEKBAR_THUMBNAILS.get();
+    }
+
     private static final int timeBarChapterViewId =
             ResourceUtils.getIdIdentifier("time_bar_chapter_title");
 

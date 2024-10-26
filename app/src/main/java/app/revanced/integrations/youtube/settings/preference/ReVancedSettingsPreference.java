@@ -53,6 +53,7 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
         MiniPlayerPreferenceLinks();
         NavigationPreferenceLinks();
         RYDPreferenceLinks();
+        SeekBarPreferenceLinks();
         SpeedOverlayPreferenceLinks();
         QuickActionsPreferenceLinks();
         TabletLayoutLinks();
@@ -240,6 +241,16 @@ public class ReVancedSettingsPreference extends ReVancedPreferenceFragment {
         shortsPreference.setSummaryOn(shortsSummary);
         percentagePreference.setOnPreferenceChangeListener(clearAllUICaches);
         compactLayoutPreference.setOnPreferenceChangeListener(clearAllUICaches);
+    }
+
+    /**
+     * Enable/Disable Preference related to Seek bar settings
+     */
+    private static void SeekBarPreferenceLinks() {
+        enableDisablePreferences(
+                Settings.RESTORE_OLD_SEEKBAR_THUMBNAILS.get(),
+                Settings.ENABLE_SEEKBAR_THUMBNAILS_HIGH_QUALITY
+        );
     }
 
     /**
