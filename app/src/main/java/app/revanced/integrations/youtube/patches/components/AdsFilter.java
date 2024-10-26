@@ -1,5 +1,8 @@
 package app.revanced.integrations.youtube.patches.components;
 
+import androidx.annotation.Nullable;
+
+import app.revanced.integrations.shared.patches.components.ByteArrayFilterGroup;
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.youtube.settings.Settings;
@@ -19,6 +22,9 @@ import app.revanced.integrations.youtube.settings.Settings;
  */
 @SuppressWarnings("unused")
 public final class AdsFilter extends Filter {
+
+    private final StringFilterGroup playerShoppingShelf;
+    private final ByteArrayFilterGroup playerShoppingShelfBuffer;
 
     public AdsFilter() {
 
@@ -123,9 +129,32 @@ public final class AdsFilter extends Filter {
                 "watch_metadata_app_promo"
         );
 
+        playerShoppingShelf = new StringFilterGroup(
+                null,
+                "horizontal_shelf.eml"
+        );
+
+        playerShoppingShelfBuffer = new ByteArrayFilterGroup(
+                Settings.HIDE_PLAYER_STORE_SHELF,
+                "shopping_item_card_list.eml"
+        );
+
         addPathCallbacks(
                 generalAdsPath,
+                playerShoppingShelf,
                 viewProducts
         );
+    }
+
+    @Override
+    public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
+                              StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
+        if (matchedGroup == playerShoppingShelf) {
+            if (contentIndex == 0 && playerShoppingShelfBuffer.check(protobufBufferArray).isFiltered()) {
+                return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+            }
+            return false;
+        }
+        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
 }
