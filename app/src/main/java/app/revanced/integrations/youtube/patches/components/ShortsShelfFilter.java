@@ -8,6 +8,7 @@ import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
+import app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
 import app.revanced.integrations.youtube.shared.RootView;
 
 @SuppressWarnings("unused")
@@ -26,11 +27,6 @@ public final class ShortsShelfFilter extends Filter {
     private static final StringTrieSearch feedGroup = new StringTrieSearch();
     private static final BooleanSetting hideShortsShelf = Settings.HIDE_SHORTS_SHELF;
     private static final BooleanSetting hideChannel = Settings.HIDE_SHORTS_SHELF_CHANNEL;
-    private static final boolean hideHomeAndRelatedVideos = Settings.HIDE_SHORTS_SHELF_HOME_RELATED_VIDEOS.get();
-    private static final boolean hideSubscriptions = Settings.HIDE_SHORTS_SHELF_SUBSCRIPTIONS.get();
-    private static final boolean hideSearch = Settings.HIDE_SHORTS_SHELF_SEARCH.get();
-    private static final boolean hideHistory = Settings.HIDE_SHORTS_SHELF_HISTORY.get();
-    private final StringTrieSearch exceptions = new StringTrieSearch();
     private static final ByteArrayFilterGroup channelProfileShelfHeader =
             new ByteArrayFilterGroup(
                     hideChannel,
@@ -38,9 +34,6 @@ public final class ShortsShelfFilter extends Filter {
             );
 
     public ShortsShelfFilter() {
-        if (!hideHistory) {
-            exceptions.addPattern("library_recent_shelf.eml");
-        }
         feedGroup.addPattern(CONVERSATION_CONTEXT_FEED_IDENTIFIER);
 
         final StringFilterGroup channelProfile = new StringFilterGroup(
@@ -94,9 +87,6 @@ public final class ShortsShelfFilter extends Filter {
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                               StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
-        if (exceptions.matches(path)) {
-            return false;
-        }
         // Check channel profile components first
         if (matchedGroup == shelfHeaderPath) {
             // Because the header is used in watch history and possibly other places, check for the index,
@@ -113,7 +103,7 @@ public final class ShortsShelfFilter extends Filter {
             return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
         }
         // Check feed components
-        if (!hideShelves()) {
+        if (!shouldHideShortsFeedItems(NavigationButton.getSelectedNavigationButton(), RootView.getBrowseId())) {
             return false;
         }
         if (matchedGroup == compactFeedVideoPath) {
@@ -133,7 +123,12 @@ public final class ShortsShelfFilter extends Filter {
         return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
 
-    private static boolean hideShelves() {
+    private static boolean shouldHideShortsFeedItems(NavigationButton selectedNavButton, String browseId) {
+        final boolean hideHomeAndRelatedVideos = Settings.HIDE_SHORTS_SHELF_HOME_RELATED_VIDEOS.get();
+        final boolean hideSubscriptions = Settings.HIDE_SHORTS_SHELF_SUBSCRIPTIONS.get();
+        final boolean hideSearch = Settings.HIDE_SHORTS_SHELF_SEARCH.get();
+        final boolean hideHistory = Settings.HIDE_SHORTS_SHELF_HISTORY.get();
+
         if (hideHomeAndRelatedVideos && hideSubscriptions && hideSearch && hideHistory) {
             // Shorts suggestions can load in the background if a video is opened and
             // then immediately minimized before any suggestions are loaded.
@@ -157,12 +152,10 @@ public final class ShortsShelfFilter extends Filter {
             return hideSearch;
         }
 
-        // Avoid checking navigation button status if all other Shorts should show.
-        if (!hideHomeAndRelatedVideos && !hideSubscriptions && !hideHistory) {
-            return false;
+        // Unknown tab, treat the same as home.
+        if (selectedNavButton == null) {
+            return hideHomeAndRelatedVideos;
         }
-
-        final String browseId = RootView.getBrowseId();
         switch (browseId) {
             case BROWSE_ID_HISTORY, BROWSE_ID_LIBRARY, BROWSE_ID_NOTIFICATION_INBOX -> {
                 return hideHistory;
