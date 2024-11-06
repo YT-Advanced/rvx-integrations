@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
+import app.revanced.integrations.shared.settings.BaseSettings;
+import app.revanced.integrations.shared.settings.BooleanSetting;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.StringTrieSearch;
 
@@ -24,6 +26,8 @@ final class DummyFilter extends Filter { }
 
 @SuppressWarnings("unused")
 public final class InclusiveSpanPatch {
+    private static final BooleanSetting ENABLE_DEBUG_LOGGING = BaseSettings.ENABLE_DEBUG_LOGGING;
+
     /**
      * Simple wrapper to pass the litho parameters through the prefix search.
      */
@@ -121,9 +125,11 @@ public final class InclusiveSpanPatch {
             filterUsingCallbacks(filter, filter.callbacks);
         }
 
-        Logger.printDebug(() -> "Using: "
-                + searchTree.numberOfPatterns() + " conversion context filters"
-                + " (" + searchTree.getEstimatedMemorySize() + " KB)");
+        if (ENABLE_DEBUG_LOGGING.get()) {
+            Logger.printDebug(() -> "Using: "
+                    + searchTree.numberOfPatterns() + " conversion context filters"
+                    + " (" + searchTree.getEstimatedMemorySize() + " KB)");
+        }
     }
 
     private static void filterUsingCallbacks(Filter filter, List<StringFilterGroup> groups) {
@@ -163,7 +169,10 @@ public final class InclusiveSpanPatch {
 
             LithoFilterParameters parameter =
                     new LithoFilterParameters(conversionContext, spannableString, span, start, end, flags);
-            Logger.printDebug(() -> "Searching...\n\u200B\n" + parameter);
+
+            if (ENABLE_DEBUG_LOGGING.get()) {
+                Logger.printDebug(() -> "Searching...\n\u200B\n" + parameter);
+            }
 
             return searchTree.matches(parameter.conversionContext, parameter);
         } catch (Exception ex) {
