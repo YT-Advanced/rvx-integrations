@@ -43,36 +43,34 @@ import app.revanced.integrations.shared.utils.StringRef;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.settings.Settings;
 
-/**
- * @noinspection deprecation
- */
+@SuppressWarnings({"deprecation", "StaticFieldLeak"})
 public enum SegmentCategory {
-    SPONSOR("sponsor", sf("revanced_sb_segments_sponsor"), sf("revanced_sb_segments_sponsor_sum"), sf("revanced_sb_skip_button_sponsor"), sf("revanced_sb_skipped_sponsor"),
+    SPONSOR("sponsor", sf("revanced_sb_segments_sponsor"), sf("revanced_sb_skip_button_sponsor"), sf("revanced_sb_skipped_sponsor"),
             SB_CATEGORY_SPONSOR, SB_CATEGORY_SPONSOR_COLOR),
-    SELF_PROMO("selfpromo", sf("revanced_sb_segments_selfpromo"), sf("revanced_sb_segments_selfpromo_sum"), sf("revanced_sb_skip_button_selfpromo"), sf("revanced_sb_skipped_selfpromo"),
+    SELF_PROMO("selfpromo", sf("revanced_sb_segments_selfpromo"), sf("revanced_sb_skip_button_selfpromo"), sf("revanced_sb_skipped_selfpromo"),
             SB_CATEGORY_SELF_PROMO, SB_CATEGORY_SELF_PROMO_COLOR),
-    INTERACTION("interaction", sf("revanced_sb_segments_interaction"), sf("revanced_sb_segments_interaction_sum"), sf("revanced_sb_skip_button_interaction"), sf("revanced_sb_skipped_interaction"),
+    INTERACTION("interaction", sf("revanced_sb_segments_interaction"), sf("revanced_sb_skip_button_interaction"), sf("revanced_sb_skipped_interaction"),
             SB_CATEGORY_INTERACTION, SB_CATEGORY_INTERACTION_COLOR),
     /**
      * Unique category that is treated differently than the rest.
      */
-    HIGHLIGHT("poi_highlight", sf("revanced_sb_segments_highlight"), sf("revanced_sb_segments_highlight_sum"), sf("revanced_sb_skip_button_highlight"), sf("revanced_sb_skipped_highlight"),
+    HIGHLIGHT("poi_highlight", sf("revanced_sb_segments_highlight"), sf("revanced_sb_skip_button_highlight"), sf("revanced_sb_skipped_highlight"),
             SB_CATEGORY_HIGHLIGHT, SB_CATEGORY_HIGHLIGHT_COLOR),
-    INTRO("intro", sf("revanced_sb_segments_intro"), sf("revanced_sb_segments_intro_sum"),
+    INTRO("intro", sf("revanced_sb_segments_intro"),
             sf("revanced_sb_skip_button_intro_beginning"), sf("revanced_sb_skip_button_intro_middle"), sf("revanced_sb_skip_button_intro_end"),
             sf("revanced_sb_skipped_intro_beginning"), sf("revanced_sb_skipped_intro_middle"), sf("revanced_sb_skipped_intro_end"),
             SB_CATEGORY_INTRO, SB_CATEGORY_INTRO_COLOR),
-    OUTRO("outro", sf("revanced_sb_segments_outro"), sf("revanced_sb_segments_outro_sum"), sf("revanced_sb_skip_button_outro"), sf("revanced_sb_skipped_outro"),
+    OUTRO("outro", sf("revanced_sb_segments_outro"), sf("revanced_sb_skip_button_outro"), sf("revanced_sb_skipped_outro"),
             SB_CATEGORY_OUTRO, SB_CATEGORY_OUTRO_COLOR),
-    PREVIEW("preview", sf("revanced_sb_segments_preview"), sf("revanced_sb_segments_preview_sum"),
+    PREVIEW("preview", sf("revanced_sb_segments_preview"),
             sf("revanced_sb_skip_button_preview_beginning"), sf("revanced_sb_skip_button_preview_middle"), sf("revanced_sb_skip_button_preview_end"),
             sf("revanced_sb_skipped_preview_beginning"), sf("revanced_sb_skipped_preview_middle"), sf("revanced_sb_skipped_preview_end"),
             SB_CATEGORY_PREVIEW, SB_CATEGORY_PREVIEW_COLOR),
-    FILLER("filler", sf("revanced_sb_segments_filler"), sf("revanced_sb_segments_filler_sum"), sf("revanced_sb_skip_button_filler"), sf("revanced_sb_skipped_filler"),
+    FILLER("filler", sf("revanced_sb_segments_filler"), sf("revanced_sb_skip_button_filler"), sf("revanced_sb_skipped_filler"),
             SB_CATEGORY_FILLER, SB_CATEGORY_FILLER_COLOR),
-    MUSIC_OFFTOPIC("music_offtopic", sf("revanced_sb_segments_nomusic"), sf("revanced_sb_segments_nomusic_sum"), sf("revanced_sb_skip_button_nomusic"), sf("revanced_sb_skipped_nomusic"),
+    MUSIC_OFFTOPIC("music_offtopic", sf("revanced_sb_segments_nomusic"), sf("revanced_sb_skip_button_nomusic"), sf("revanced_sb_skipped_nomusic"),
             SB_CATEGORY_MUSIC_OFFTOPIC, SB_CATEGORY_MUSIC_OFFTOPIC_COLOR),
-    UNSUBMITTED("unsubmitted", StringRef.empty, StringRef.empty, sf("revanced_sb_skip_button_unsubmitted"), sf("revanced_sb_skipped_unsubmitted"),
+    UNSUBMITTED("unsubmitted", StringRef.empty, sf("revanced_sb_skip_button_unsubmitted"), sf("revanced_sb_skipped_unsubmitted"),
             SB_CATEGORY_UNSUBMITTED, SB_CATEGORY_UNSUBMITTED_COLOR),
     ;
 
@@ -159,14 +157,12 @@ public enum SegmentCategory {
     @NonNull
     public final String keyValue;
     @NonNull
-    private final StringSetting behaviorSetting;
+    public final StringSetting behaviorSetting;
     @NonNull
     private final StringSetting colorSetting;
 
     @NonNull
     public final StringRef title;
-    @NonNull
-    public final StringRef description;
 
     /**
      * Skip button text, if the skip occurs in the first quarter of the video
@@ -214,23 +210,22 @@ public enum SegmentCategory {
     @NonNull
     public CategoryBehaviour behaviour = CategoryBehaviour.IGNORE;
 
-    SegmentCategory(String keyValue, StringRef title, StringRef description,
+    SegmentCategory(String keyValue, StringRef title,
                     StringRef skipButtonText,
                     StringRef skippedToastText,
                     StringSetting behavior, StringSetting color) {
-        this(keyValue, title, description,
+        this(keyValue, title,
                 skipButtonText, skipButtonText, skipButtonText,
                 skippedToastText, skippedToastText, skippedToastText,
                 behavior, color);
     }
 
-    SegmentCategory(String keyValue, StringRef title, StringRef description,
+    SegmentCategory(String keyValue, StringRef title,
                     StringRef skipButtonTextBeginning, StringRef skipButtonTextMiddle, StringRef skipButtonTextEnd,
                     StringRef skippedToastBeginning, StringRef skippedToastMiddle, StringRef skippedToastEnd,
                     StringSetting behavior, StringSetting color) {
         this.keyValue = Objects.requireNonNull(keyValue);
         this.title = Objects.requireNonNull(title);
-        this.description = Objects.requireNonNull(description);
         this.skipButtonTextBeginning = Objects.requireNonNull(skipButtonTextBeginning);
         this.skipButtonTextMiddle = Objects.requireNonNull(skipButtonTextMiddle);
         this.skipButtonTextEnd = Objects.requireNonNull(skipButtonTextEnd);

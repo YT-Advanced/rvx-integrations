@@ -35,14 +35,17 @@ public class SegmentCategoryListPreference extends ListPreference {
         final SegmentCategory segmentCategory = SegmentCategory.byCategoryKey(getKey());
         final boolean isHighlightCategory = segmentCategory == SegmentCategory.HIGHLIGHT;
         mCategory = Objects.requireNonNull(segmentCategory);
-        setDefaultValue(segmentCategory.behaviour.reVancedKeyValue);
+        // Edit: Using preferences to sync together multiple pieces
+        // of code together is messy and should be rethought.
+        setKey(segmentCategory.behaviorSetting.key);
+        setDefaultValue(segmentCategory.behaviorSetting.defaultValue);
+
         setEntries(isHighlightCategory
                 ? CategoryBehaviour.getBehaviorDescriptionsWithoutSkipOnce()
                 : CategoryBehaviour.getBehaviorDescriptions());
         setEntryValues(isHighlightCategory
                 ? CategoryBehaviour.getBehaviorKeyValuesWithoutSkipOnce()
                 : CategoryBehaviour.getBehaviorKeyValues());
-        setSummary(segmentCategory.description.toString());
         updateTitle();
     }
 
@@ -137,7 +140,6 @@ public class SegmentCategoryListPreference extends ListPreference {
                 }
             });
             builder.setNegativeButton(android.R.string.cancel, null);
-
             mClickedDialogEntryIndex = findIndexOfValue(getValue());
             builder.setSingleChoiceItems(getEntries(), mClickedDialogEntryIndex, (dialog, which) -> mClickedDialogEntryIndex = which);
         } catch (Exception ex) {

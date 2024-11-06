@@ -80,10 +80,6 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
 
             if (mPreference == null) return;
 
-            if (mPreference instanceof app.revanced.integrations.youtube.settings.preference.SegmentCategoryListPreference) {
-                return;
-            }
-
             if (mPreference instanceof SwitchPreference switchPreference) {
                 BooleanSetting boolSetting = (BooleanSetting) setting;
                 if (settingImportInProgress) {
@@ -109,12 +105,13 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
                 } else {
                     Setting.privateSetValueFromString(setting, listPreference.getValue());
                 }
-
                 if (setting.equals(DEFAULT_PLAYBACK_SPEED)) {
                     listPreference.setEntries(CustomPlaybackSpeedPatch.getListEntries());
                     listPreference.setEntryValues(CustomPlaybackSpeedPatch.getListEntryValues());
                 }
-                updateListPreferenceSummary(listPreference, setting);
+                if (!(mPreference instanceof app.revanced.integrations.youtube.settings.preference.SegmentCategoryListPreference)) {
+                    updateListPreferenceSummary(listPreference, setting);
+                }
             } else {
                 Logger.printException(() -> "Setting cannot be handled: " + mPreference.getClass() + " " + mPreference);
                 return;
@@ -276,7 +273,9 @@ public class ReVancedPreferenceFragment extends PreferenceFragment {
                         listPreference.setEntries(CustomPlaybackSpeedPatch.getListEntries());
                         listPreference.setEntryValues(CustomPlaybackSpeedPatch.getListEntryValues());
                     }
-                    updateListPreferenceSummary(listPreference, setting);
+                    if (!(preference instanceof app.revanced.integrations.youtube.settings.preference.SegmentCategoryListPreference)) {
+                        updateListPreferenceSummary(listPreference, setting);
+                    }
                 }
             }
 
