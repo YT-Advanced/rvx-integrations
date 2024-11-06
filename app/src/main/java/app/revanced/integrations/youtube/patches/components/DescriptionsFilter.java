@@ -37,10 +37,16 @@ public final class DescriptionsFilter extends Filter {
                 "transcript_section.eml"
         );
 
+        final StringFilterGroup videoSummarySection = new StringFilterGroup(
+                Settings.HIDE_AI_GENERATED_VIDEO_SUMMARY_SECTION,
+                "cell_expandable_metadata.eml-js"
+        );
+
         addIdentifierCallbacks(
                 attributesSection,
                 podcastSection,
-                transcriptSection
+                transcriptSection,
+                videoSummarySection
         );
 
         howThisWasMadeSection = new StringFilterGroup(
