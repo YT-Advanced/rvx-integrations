@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
+import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
 import app.revanced.integrations.youtube.shared.RootView;
@@ -44,32 +45,38 @@ public final class CarouselShelfFilter extends Filter {
         );
     }
 
-    private static boolean hideShelves(NavigationButton selectedNavButton, String browseId) {
+    private static boolean hideShelves(boolean playerActive, boolean searchBarActive, NavigationButton selectedNavButton, String browseId) {
         // Must check player type first, as search bar can be active behind the player.
-        if (RootView.isPlayerActive()) {
+        if (playerActive) {
             return false;
         }
         // Must check second, as search can be from any tab.
-        if (RootView.isSearchBarActive()) {
+        if (searchBarActive) {
             return true;
         }
         // Unknown tab, treat the same as home.
         if (selectedNavButton == null) {
             return true;
         }
-        if (knownBrowseId.get().anyMatch(browseId::equals)) {
-            return true;
-        }
-        return whitelistBrowseId.get().noneMatch(browseId::equals);
+        return knownBrowseId.get().anyMatch(browseId::equals) || whitelistBrowseId.get().noneMatch(browseId::equals);
     }
 
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                               StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
-        if (contentIndex == 0 && hideShelves(NavigationButton.getSelectedNavigationButton(), RootView.getBrowseId())) {
-            return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
+        final boolean playerActive = RootView.isPlayerActive();
+        final boolean searchBarActive = RootView.isSearchBarActive();
+        final NavigationButton navigationButton = NavigationButton.getSelectedNavigationButton();
+        final String navigation = navigationButton == null ? "null" : navigationButton.name();
+        final String browseId = RootView.getBrowseId();
+        final boolean hideShelves = hideShelves(playerActive, searchBarActive, navigationButton, browseId);
+        if (contentIndex != 0) {
+            return false;
         }
-
-        return false;
+        Logger.printDebug(() -> "hideShelves: " + hideShelves + "\nplayerActive: " + playerActive + "\nsearchBarActive: " + searchBarActive + "\nbrowseId: " + browseId + "\nnavigation: " + navigation);
+        if (!hideShelves) {
+            return false;
+        }
+        return super.isFiltered(path, identifier, allValue, protobufBufferArray, matchedGroup, contentType, contentIndex);
     }
 }
