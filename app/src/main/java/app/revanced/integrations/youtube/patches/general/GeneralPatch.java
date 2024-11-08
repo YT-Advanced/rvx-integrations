@@ -310,10 +310,10 @@ public class GeneralPatch {
                 return;
             if (!(viewGroup.getChildAt(0) instanceof ImageView imageView))
                 return;
-            final Activity mAcrivity = Utils.getActivity();
-            if (mAcrivity == null)
+            final Activity mActivity = Utils.getActivity();
+            if (mActivity == null)
                 return;
-            imageView.setImageDrawable(getHeaderDrawable(mAcrivity, headerAttributeId));
+            imageView.setImageDrawable(getHeaderDrawable(mActivity, headerAttributeId));
         });
     }
 
@@ -481,10 +481,18 @@ public class GeneralPatch {
         }
     }
 
+    /**
+     * In ReVanced, image files are replaced to change the header,
+     * Whereas in RVX, the header is changed programmatically.
+     * There is an issue where the header is not changed in RVX when YouTube Doodles are hidden.
+     * As a workaround, manually set the header when YouTube Doodles are hidden.
+     */
     public static void hideYouTubeDoodles(ImageView imageView, Drawable drawable) {
-        if (!Settings.HIDE_YOUTUBE_DOODLES.get()) {
-            imageView.setImageDrawable(drawable);
+        final Activity mActivity = Utils.getActivity();
+        if (Settings.HIDE_YOUTUBE_DOODLES.get() && mActivity != null) {
+            drawable = getHeaderDrawable(mActivity, getHeaderAttributeId());
         }
+        imageView.setImageDrawable(drawable);
     }
 
     private static final int settingsDrawableId =
