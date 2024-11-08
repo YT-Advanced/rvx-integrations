@@ -40,7 +40,7 @@ public class AppClient {
      * Store page of the YouTube app</a>, in the {@code What’s New} section.
      * </p>
      */
-    private static final String CLIENT_VERSION_IOS = "19.16.3";
+    private static final String CLIENT_VERSION_IOS = "19.30.2";
     private static final String DEVICE_MAKE_IOS = "Apple";
     /**
      * The device machine id for the iPhone XS Max (iPhone11,4), used to get 60fps.
