@@ -1,10 +1,14 @@
 package app.revanced.integrations.youtube.patches.misc.requests;
 
+import static app.revanced.integrations.youtube.patches.misc.requests.PlayerRoutes.GET_LIVE_STREAM_RENDERER;
 import static app.revanced.integrations.youtube.patches.misc.requests.PlayerRoutes.GET_STREAMING_DATA;
 
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,16 +27,19 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import app.revanced.integrations.shared.requests.Requester;
 import app.revanced.integrations.shared.utils.Logger;
 import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.misc.client.AppClient.ClientType;
 import app.revanced.integrations.youtube.settings.Settings;
 
 public class StreamingDataRequest {
+    private static final boolean SPOOF_STREAMING_DATA_IOS_COMPATIBILITY = Settings.SPOOF_STREAMING_DATA_IOS_COMPATIBILITY.get();
+
     private static final ClientType[] allClientTypes = {
+            ClientType.IOS,
             ClientType.ANDROID_VR,
             ClientType.ANDROID_UNPLUGGED,
-            ClientType.IOS,
     };
 
     private static final ClientType[] clientTypesToUse;
@@ -100,6 +107,59 @@ public class StreamingDataRequest {
         Logger.printInfo(() -> toastMessage, ex);
     }
 
+    private static boolean isUnplayableOrLiveStream(ClientType clientType, String videoId) {
+        if (!SPOOF_STREAMING_DATA_IOS_COMPATIBILITY || clientType != ClientType.IOS) {
+            return false;
+        }
+        Objects.requireNonNull(videoId);
+        try {
+            HttpURLConnection connection = PlayerRoutes.getPlayerResponseConnectionFromRoute(GET_LIVE_STREAM_RENDERER, clientType);
+            String innerTubeBody = PlayerRoutes.createInnertubeBody(clientType, videoId);
+            byte[] requestBody = innerTubeBody.getBytes(StandardCharsets.UTF_8);
+            connection.setFixedLengthStreamingMode(requestBody.length);
+            connection.getOutputStream().write(requestBody);
+
+            final int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                JSONObject playerResponse = Requester.parseJSONObject(connection);
+                final boolean isPlayabilityOk = isPlayabilityStatusOk(playerResponse);
+                final boolean isLiveStream = isLiveStream(playerResponse);
+                return !isPlayabilityOk || isLiveStream;
+            }
+
+            // Always show a toast for this, as a non 200 response means something is broken.
+            handleConnectionError("Fetch livestreams not available: " + responseCode, null);
+        } catch (SocketTimeoutException ex) {
+            handleConnectionError("Fetch livestreams temporarily not available (API timed out)", ex);
+        } catch (IOException ex) {
+            handleConnectionError("Fetch livestreams temporarily not available: " + ex.getMessage(), ex);
+        } catch (Exception ex) {
+            Logger.printException(() -> "Fetch livestreams failed", ex); // Should never happen.
+        }
+
+        return true;
+    }
+
+    private static boolean isPlayabilityStatusOk(@NonNull JSONObject playerResponse) {
+        try {
+            return playerResponse.getJSONObject("playabilityStatus").getString("status").equals("OK");
+        } catch (JSONException e) {
+            Logger.printDebug(() -> "Failed to get playabilityStatus for response: " + playerResponse);
+        }
+
+        return false;
+    }
+
+    private static boolean isLiveStream(@NonNull JSONObject playerResponse) {
+        try {
+            return playerResponse.getJSONObject("videoDetails").getBoolean("isLiveContent");
+        } catch (JSONException e) {
+            Logger.printDebug(() -> "Failed to get videoDetails for response: " + playerResponse);
+        }
+
+        return false;
+    }
+
     private static final String[] REQUEST_HEADER_KEYS = {
             "Authorization", // Available only to logged in users.
             "X-GOOG-API-FORMAT-VERSION",
@@ -158,6 +218,11 @@ public class StreamingDataRequest {
 
         // Retry with different client if empty response body is received.
         for (ClientType clientType : clientTypesToUse) {
+            if (isUnplayableOrLiveStream(clientType, videoId)) {
+                Logger.printDebug(() -> "Ignore IOS spoofing as it is unplayable or a live stream (video: " + videoId + ")");
+                continue;
+            }
+
             HttpURLConnection connection = send(clientType, videoId, playerHeaders);
             if (connection != null) {
                 try {

@@ -77,7 +77,7 @@ public class PlaylistRequest {
 
         final long startTime = System.currentTimeMillis();
         String clientTypeName = clientType.name();
-        Logger.printDebug(() -> "Fetching playlist request for: " + videoId + " using client: " + clientType.name());
+        Logger.printDebug(() -> "Fetching playlist request for: " + videoId + " using client: " + clientTypeName);
 
         try {
             HttpURLConnection connection = PlayerRoutes.getPlayerResponseConnectionFromRoute(GET_PLAYLIST_PAGE, clientType);
