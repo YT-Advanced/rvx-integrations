@@ -47,9 +47,4 @@ public class PatchStatus {
         return false;
     }
 
-    // Modified by a patch. Do not touch.
-    public static String SpoofAppVersionDefaultString() {
-        return "18.17.43";
-    }
-
 }
