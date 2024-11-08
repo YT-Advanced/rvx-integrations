@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import app.revanced.integrations.shared.patches.components.Filter;
 import app.revanced.integrations.shared.patches.components.StringFilterGroup;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.StringTrieSearch;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.shared.NavigationBar.NavigationButton;
 import app.revanced.integrations.youtube.shared.RootView;
@@ -33,16 +34,25 @@ public final class CarouselShelfFilter extends Filter {
             BROWSE_ID_NOTIFICATION_INBOX
     );
 
+    private final StringTrieSearch exceptions = new StringTrieSearch();
+    public final StringFilterGroup horizontalShelf;
+
     public CarouselShelfFilter() {
-        addPathCallbacks(
-                new StringFilterGroup(
-                        Settings.HIDE_CAROUSEL_SHELF,
-                        "horizontal_video_shelf.eml",
-                        "horizontal_shelf.eml",
-                        "horizontal_shelf_inline.eml",
-                        "horizontal_tile_shelf.eml"
-                )
+        exceptions.addPattern("library_recent_shelf.eml");
+
+        final StringFilterGroup carouselShelf = new StringFilterGroup(
+                Settings.HIDE_CAROUSEL_SHELF,
+                "horizontal_shelf_inline.eml",
+                "horizontal_tile_shelf.eml",
+                "horizontal_video_shelf.eml"
         );
+
+        horizontalShelf = new StringFilterGroup(
+                Settings.HIDE_CAROUSEL_SHELF,
+                "horizontal_shelf.eml"
+        );
+
+        addPathCallbacks(carouselShelf, horizontalShelf);
     }
 
     private static boolean hideShelves(boolean playerActive, boolean searchBarActive, NavigationButton selectedNavButton, String browseId) {
@@ -64,12 +74,15 @@ public final class CarouselShelfFilter extends Filter {
     @Override
     public boolean isFiltered(String path, @Nullable String identifier, String allValue, byte[] protobufBufferArray,
                               StringFilterGroup matchedGroup, FilterContentType contentType, int contentIndex) {
+        if (exceptions.matches(path)) {
+            return false;
+        }
         final boolean playerActive = RootView.isPlayerActive();
         final boolean searchBarActive = RootView.isSearchBarActive();
         final NavigationButton navigationButton = NavigationButton.getSelectedNavigationButton();
         final String navigation = navigationButton == null ? "null" : navigationButton.name();
         final String browseId = RootView.getBrowseId();
-        final boolean hideShelves = hideShelves(playerActive, searchBarActive, navigationButton, browseId);
+        final boolean hideShelves = matchedGroup != horizontalShelf || hideShelves(playerActive, searchBarActive, navigationButton, browseId);
         if (contentIndex != 0) {
             return false;
         }
