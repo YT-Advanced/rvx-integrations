@@ -258,9 +258,10 @@ public class StreamingDataRequest {
                                 }
 
                                 byte[] streamingDataByteArray = baos.toByteArray();
-                                if (isLiveStream(clientType, new ByteArrayInputStream(streamingDataByteArray)))
-                                    throw new IOException("Ignore IOS spoofing as it is livestream (video: " + videoId + ")");
-
+                                if (isLiveStream(clientType, new ByteArrayInputStream(streamingDataByteArray))) {
+                                    Logger.printDebug(() -> "Ignore IOS spoofing as it is a live stream (video: " + videoId + ")");
+                                    continue;
+                                }
                                 lastSpoofedClientType = clientType;
 
                                 return ByteBuffer.wrap(streamingDataByteArray);
