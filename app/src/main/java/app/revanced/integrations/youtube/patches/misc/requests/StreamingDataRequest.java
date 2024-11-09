@@ -11,9 +11,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -160,6 +163,23 @@ public class StreamingDataRequest {
         return false;
     }
 
+    private static Boolean isLiveStream(ClientType clientType, InputStream inputStream) throws IOException {
+        if (SPOOF_STREAMING_DATA_IOS_COMPATIBILITY || clientType != ClientType.IOS) return false;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Normal video
+                if (line.contains("&source=youtube")) return false;
+                // Video is livestream
+                if (line.contains("&source=yt_live_broadcast")) return true;
+                // Video is premiere
+                if (line.contains("&source=yt_premiere_broadcast")) return true;
+            }
+        }
+        return true; // Should never happen
+    }
+
     private static final String[] REQUEST_HEADER_KEYS = {
             "Authorization", // Available only to logged in users.
             "X-GOOG-API-FORMAT-VERSION",
@@ -236,9 +256,14 @@ public class StreamingDataRequest {
                                 while ((bytesRead = inputStream.read(buffer)) >= 0) {
                                     baos.write(buffer, 0, bytesRead);
                                 }
+
+                                byte[] streamingDataByteArray = baos.toByteArray();
+                                if (isLiveStream(clientType, new ByteArrayInputStream(streamingDataByteArray)))
+                                    throw new IOException("Ignore IOS spoofing as it is livestream (video: " + videoId + ")");
+
                                 lastSpoofedClientType = clientType;
 
-                                return ByteBuffer.wrap(baos.toByteArray());
+                                return ByteBuffer.wrap(streamingDataByteArray);
                             }
                         }
                     }
