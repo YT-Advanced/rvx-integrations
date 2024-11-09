@@ -11,12 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
@@ -163,21 +160,9 @@ public class StreamingDataRequest {
         return false;
     }
 
-    private static Boolean isLiveStream(ClientType clientType, InputStream inputStream) throws IOException {
-        if (SPOOF_STREAMING_DATA_IOS_COMPATIBILITY || clientType != ClientType.IOS) return false;
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Normal video
-                if (line.contains("&source=youtube")) return false;
-                // Video is livestream
-                if (line.contains("&source=yt_live_broadcast")) return true;
-                // Video is premiere
-                if (line.contains("&source=yt_premiere_broadcast")) return true;
-            }
-        }
-        return true; // Should never happen
+    private static boolean isLiveStream(String streamingData) {
+        // Check the source parameter in streamingData
+        return streamingData.contains("yt_live_broadcast") || streamingData.contains("yt_premiere_broadcast");
     }
 
     private static final String[] REQUEST_HEADER_KEYS = {
@@ -253,18 +238,25 @@ public class StreamingDataRequest {
                             try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
                                 byte[] buffer = new byte[8192];
                                 int bytesRead;
+
+                                // Skip if iOS Compatibility Mode is enabled or the client is not iOS
+                                boolean shouldSkipParsing = (SPOOF_STREAMING_DATA_IOS_COMPATIBILITY || clientType != ClientType.IOS);
+
                                 while ((bytesRead = inputStream.read(buffer)) >= 0) {
                                     baos.write(buffer, 0, bytesRead);
+
+                                    // Only parsing first 8192 byte to check
+                                    if (shouldSkipParsing) continue;
+                                    shouldSkipParsing = true;
+
+                                    if (isLiveStream(new String(buffer, 0, bytesRead))) {
+                                        throw new IOException("Ignore IOS spoofing as it is livestream (video: " + videoId + ")");
+                                    }
                                 }
 
-                                byte[] streamingDataByteArray = baos.toByteArray();
-                                if (isLiveStream(clientType, new ByteArrayInputStream(streamingDataByteArray))) {
-                                    Logger.printDebug(() -> "Ignore IOS spoofing as it is a live stream (video: " + videoId + ")");
-                                    continue;
-                                }
                                 lastSpoofedClientType = clientType;
 
-                                return ByteBuffer.wrap(streamingDataByteArray);
+                                return ByteBuffer.wrap(baos.toByteArray());
                             }
                         }
                     }
