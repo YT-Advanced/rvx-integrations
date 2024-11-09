@@ -545,7 +545,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting SPOOF_STREAMING_DATA = new BooleanSetting("revanced_spoof_streaming_data", TRUE, true, "revanced_spoof_streaming_data_user_dialog_message");
     public static final BooleanSetting SPOOF_STREAMING_DATA_IOS_FORCE_AVC = new BooleanSetting("revanced_spoof_streaming_data_ios_force_avc", FALSE, true,
             "revanced_spoof_streaming_data_ios_force_avc_user_dialog_message", new SpoofStreamingDataPatch.ForceiOSAVCAvailability());
-    public static final BooleanSetting SPOOF_STREAMING_DATA_IOS_COMPATIBILITY = new BooleanSetting("revanced_spoof_streaming_data_ios_compatibility", FALSE, true, new SpoofStreamingDataPatch.ForceiOSAVCAvailability());
+    public static final BooleanSetting SPOOF_STREAMING_DATA_IOS_COMPATIBILITY = new BooleanSetting("revanced_spoof_streaming_data_ios_compatibility", TRUE, true, new SpoofStreamingDataPatch.ForceiOSAVCAvailability());
     public static final EnumSetting<ClientType> SPOOF_STREAMING_DATA_TYPE = new EnumSetting<>("revanced_spoof_streaming_data_type", ClientType.IOS, true, parent(SPOOF_STREAMING_DATA));
     public static final BooleanSetting SPOOF_STREAMING_DATA_STATS_FOR_NERDS = new BooleanSetting("revanced_spoof_streaming_data_stats_for_nerds", TRUE, parent(SPOOF_STREAMING_DATA));
 
