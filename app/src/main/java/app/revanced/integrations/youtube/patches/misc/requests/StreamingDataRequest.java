@@ -76,6 +76,11 @@ public class StreamingDataRequest {
      */
     private static final int MAX_MILLISECONDS_TO_WAIT_FOR_FETCH = 20 * 1000;
 
+    /**
+     * Size of the byte buffer used to read/write the connection stream. 
+     */
+    private static final int READ_BUFFER_SIZE = 8192;
+
     @GuardedBy("itself")
     private static final Map<String, StreamingDataRequest> cache = Collections.synchronizedMap(
             new LinkedHashMap<>(100) {
@@ -233,31 +238,32 @@ public class StreamingDataRequest {
                 try {
                     // gzip encoding doesn't response with content length (-1),
                     // but empty response body does.
-                    if (connection.getContentLength() != 0) {
-                        try (InputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
-                            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                                byte[] buffer = new byte[8192];
-                                int bytesRead;
+                    int contentLength = connection.getContentLength();
+                    if (contentLength != 0) {
+                        try (
+                            InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream(contentLength < READ_BUFFER_SIZE ? READ_BUFFER_SIZE : contentLength)
+                        ) {
+                            byte[] buffer = new byte[READ_BUFFER_SIZE];
+                            int bytesRead;
 
-                                // Skip if iOS Compatibility Mode is enabled or the client is not iOS
-                                boolean shouldSkipParsing = (SPOOF_STREAMING_DATA_IOS_COMPATIBILITY || clientType != ClientType.IOS);
+                            // Skip if iOS Compatibility Mode is enabled or the client is not iOS
+                            boolean shouldSkipParsing = (SPOOF_STREAMING_DATA_IOS_COMPATIBILITY || clientType != ClientType.IOS);
 
-                                while ((bytesRead = inputStream.read(buffer)) >= 0) {
-                                    baos.write(buffer, 0, bytesRead);
+                            while ((bytesRead = inputStream.read(buffer)) >= 0) {
+                                baos.write(buffer, 0, bytesRead);
 
-                                    // Only parsing first 8192 byte to check
-                                    if (shouldSkipParsing) continue;
-                                    shouldSkipParsing = true;
+                                // Only parsing first 8192 byte to check
+                                if (shouldSkipParsing) continue;
+                                shouldSkipParsing = true;
 
-                                    if (isLiveStream(new String(buffer, 0, bytesRead))) {
-                                        throw new IOException("Ignore IOS spoofing as it is livestream (video: " + videoId + ")");
-                                    }
+                                if (isLiveStream(new String(buffer, 0, bytesRead))) {
+                                    throw new IOException("Ignore IOS spoofing as it is livestream (video: " + videoId + ")");
                                 }
-
-                                lastSpoofedClientType = clientType;
-
-                                return ByteBuffer.wrap(baos.toByteArray());
                             }
+                            lastSpoofedClientType = clientType;
+
+                            return ByteBuffer.wrap(baos.toByteArray());
                         }
                     }
                 } catch (IOException ex) {
