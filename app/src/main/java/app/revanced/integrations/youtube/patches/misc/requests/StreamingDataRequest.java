@@ -77,7 +77,7 @@ public class StreamingDataRequest {
     private static final int MAX_MILLISECONDS_TO_WAIT_FOR_FETCH = 20 * 1000;
 
     /**
-     * Size of the byte buffer used to read/write the connection stream. 
+     * Size of the byte buffer used to read the connection stream. 
      */
     private static final int READ_BUFFER_SIZE = 8192;
 
