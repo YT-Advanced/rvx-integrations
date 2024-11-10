@@ -253,11 +253,12 @@ public class StreamingDataRequest {
                             while ((bytesRead = inputStream.read(buffer)) >= 0) {
                                 baos.write(buffer, 0, bytesRead);
 
-                                // Only parsing first 8192 byte to check
                                 if (shouldSkipParsing) continue;
                                 shouldSkipParsing = true;
 
-                                if (isLiveStream(new String(buffer, 0, bytesRead))) {
+                                // Only parsing first 512 byte to check
+                                final int lengthToCheck = Math.min(bytesRead, 512);
+                                if (isLiveStream(new String(buffer, 0, lengthToCheck))) {
                                     throw new IOException("Ignore IOS spoofing as it is livestream (video: " + videoId + ")");
                                 }
                             }
