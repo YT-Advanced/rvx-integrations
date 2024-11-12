@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Stream;
 
 import app.revanced.integrations.shared.requests.Requester;
 import app.revanced.integrations.shared.utils.Logger;
@@ -245,26 +246,26 @@ public class StreamingDataRequest {
                     if (contentLength != 0) {
                         try (
                             InputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                            ByteArrayOutputStream baos = new ByteArrayOutputStream(contentLength < READ_BUFFER_SIZE ? READ_BUFFER_SIZE : contentLength)
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream(Math.max(contentLength, READ_BUFFER_SIZE))
                         ) {
                             byte[] buffer = new byte[READ_BUFFER_SIZE];
-                            int bytesRead;
+                            int bytesRead = inputStream.read(buffer);
+
+                            if (bytesRead < 0) continue;
 
                             // Skip if iOS Compatibility Mode is enabled or the client is not iOS
-                            boolean shouldSkipParsing = (SPOOF_STREAMING_DATA_IOS_COMPATIBILITY || clientType != ClientType.IOS);
-
-                            while ((bytesRead = inputStream.read(buffer)) >= 0) {
-                                baos.write(buffer, 0, bytesRead);
-
-                                if (shouldSkipParsing) continue;
-                                shouldSkipParsing = true;
-
+                            if (!SPOOF_STREAMING_DATA_IOS_COMPATIBILITY && clientType == ClientType.IOS) {
                                 // Only parsing first 512 byte to check
                                 final int lengthToCheck = Math.min(bytesRead, 512);
                                 if (isLiveStream(new String(buffer, 0, lengthToCheck))) {
-                                    throw new IOException("Ignore IOS spoofing as it is livestream (video: " + videoId + ")");
+                                    Logger.printDebug(() -> "Ignore IOS spoofing as it is a live stream (video: " + videoId + ")");
+                                    continue;
                                 }
                             }
+
+                            do baos.write(buffer, 0, bytesRead);
+                            while ((bytesRead = inputStream.read(buffer)) >= 0);
+
                             lastSpoofedClientType = clientType;
 
                             return ByteBuffer.wrap(baos.toByteArray());
