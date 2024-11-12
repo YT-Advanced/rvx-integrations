@@ -167,7 +167,10 @@ public class StreamingDataRequest {
 
     private static boolean isLiveStream(String streamingData) {
         // Check the source parameter in streamingData
-        return streamingData.contains("yt_live_broadcast") || streamingData.contains("yt_premiere_broadcast");
+        return Stream.of(
+            "yt_live_broadcast",      // Live video
+            "yt_premiere_broadcast"   // Premiere video (Upcoming video)
+        ).anyMatch(streamingData::contains);
     }
 
     private static final String[] REQUEST_HEADER_KEYS = {
