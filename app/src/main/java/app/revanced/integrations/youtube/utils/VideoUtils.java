@@ -2,8 +2,8 @@ package app.revanced.integrations.youtube.utils;
 
 import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
+import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.userSelectedPlaybackSpeed;
-
 import android.app.AlertDialog;
 import android.content.Context;
 import android.media.AudioManager;
@@ -31,7 +31,7 @@ public class VideoUtils extends IntentUtils {
     public static void copyUrl(boolean withTimestamp) {
         StringBuilder builder = new StringBuilder("https://youtu.be/");
         builder.append(VideoInformation.getVideoId());
-        final long currentVideoTimeInSeconds = VideoInformation.getVideoTime() / 1000;
+        final long currentVideoTimeInSeconds = getVideoTimeinSeconds();
         if (withTimestamp && currentVideoTimeInSeconds > 0) {
             builder.append("?t=");
             builder.append(currentVideoTimeInSeconds);
@@ -46,6 +46,10 @@ public class VideoUtils extends IntentUtils {
     public static void copyTimeStamp() {
         final String timeStamp = getTimeStamp(VideoInformation.getVideoTime());
         setClipboard(timeStamp, str("revanced_share_copy_timestamp_success", timeStamp));
+    }
+    
+    private static long getVideoTimeinSeconds() {
+        return VideoInformation.getVideoTime() / 1000;
     }
 
     public static void launchVideoExternalDownloader() {
@@ -87,23 +91,27 @@ public class VideoUtils extends IntentUtils {
     }
 
     /**
-     * Create playlist from all channel videos from oldest to newest,
-     * starting from the video where button is clicked.
+     * Create playlist with all channel videos.
      */
-    public static void openVideo(boolean activated) {
-        openVideo(activated, VideoInformation.getVideoId(), VideoInformation.getVideoTime());
+    public static void openVideo(boolean activated, @Nullable String prefixId) {
+        final String videoId = VideoInformation.getVideoId();
+        final long currentVideoTimeInSeconds = getVideoTimeinSeconds();
+        String baseUri = "vnd.youtube://" + videoId + "?start=" + currentVideoTimeInSeconds;
+        if (activated) {
+            final String channelId = VideoInformation.getChannelId();
+            // Channel id always starts with `UC` prefix
+            if (!channelId.startsWith("UC")) {
+                showToastShort(str("revanced_overlay_button_play_all_not_available_toast"));
+                return;
+            }
+            baseUri += "&list=" + prefixId + channelId.substring(2);
+        }
+
+        launchView(baseUri, getContext().getPackageName());
     }
 
     public static void openVideo(@NonNull String videoId) {
-        openVideo(false, videoId, 0);
-    }
-
-    public static void openVideo(boolean activated, @NonNull String videoId, long videoTime) {
-        String baseUri = "vnd.youtube://" + videoId + "?start=" + videoTime / 1000;
-        if (activated) {
-            baseUri += "&list=UL" + videoId;
-        }
-
+        String baseUri = "vnd.youtube://" + videoId;
         launchView(baseUri, getContext().getPackageName());
     }
 
