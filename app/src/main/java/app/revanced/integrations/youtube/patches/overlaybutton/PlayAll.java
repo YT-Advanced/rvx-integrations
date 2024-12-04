@@ -10,18 +10,19 @@ import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.utils.VideoUtils;
 
 @SuppressWarnings("unused")
-public class TimeOrderedPlaylist extends BottomControlButton {
-    @Nullable
-    private static TimeOrderedPlaylist instance;
+public class PlayAll extends BottomControlButton {
 
-    public TimeOrderedPlaylist(ViewGroup bottomControlsViewGroup) {
+    @Nullable
+    private static PlayAll instance;
+
+    public PlayAll(ViewGroup bottomControlsViewGroup) {
         super(
                 bottomControlsViewGroup,
-                "time_ordered_playlist_button",
-                Settings.OVERLAY_BUTTON_TIME_ORDERED_PLAYLIST,
-                view -> VideoUtils.openVideo(true),
+                "play_all_button",
+                Settings.OVERLAY_BUTTON_PLAY_ALL,
+                view -> VideoUtils.openVideo(Settings.OVERLAY_BUTTON_PLAY_ALL_TYPE.get()),
                 view -> {
-                    VideoUtils.openVideo(false);
+                    VideoUtils.openVideo();
                     return true;
                 }
         );
@@ -33,7 +34,7 @@ public class TimeOrderedPlaylist extends BottomControlButton {
     public static void initialize(View bottomControlsViewGroup) {
         try {
             if (bottomControlsViewGroup instanceof ViewGroup viewGroup) {
-                instance = new TimeOrderedPlaylist(viewGroup);
+                instance = new PlayAll(viewGroup);
             }
         } catch (Exception ex) {
             Logger.printException(() -> "initialize failure", ex);

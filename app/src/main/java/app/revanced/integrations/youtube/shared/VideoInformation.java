@@ -478,6 +478,10 @@ public final class VideoInformation {
         return videoTime;
     }
 
+    public static long getVideoTimeInSeconds() {
+        return videoTime / 1000;
+    }
+
     /**
      * Injection point.
      * Called on the main thread every 100ms.
