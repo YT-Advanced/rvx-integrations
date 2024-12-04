@@ -38,9 +38,9 @@ import app.revanced.integrations.youtube.patches.general.YouTubeMusicActionsPatc
 import app.revanced.integrations.youtube.patches.misc.SpoofStreamingDataPatch;
 import app.revanced.integrations.youtube.patches.misc.WatchHistoryPatch.WatchHistoryType;
 import app.revanced.integrations.youtube.patches.misc.client.AppClient.ClientType;
-import app.revanced.integrations.youtube.patches.overlaybutton.PlayAll.PlaylistPrefixType;
 import app.revanced.integrations.youtube.patches.shorts.AnimationFeedbackPatch.AnimationType;
 import app.revanced.integrations.youtube.patches.utils.PatchStatus;
+import app.revanced.integrations.youtube.shared.PlaylistIdPrefix;
 import app.revanced.integrations.youtube.sponsorblock.SponsorBlockSettings;
 
 @SuppressWarnings("unused")
@@ -376,8 +376,7 @@ public class Settings extends BaseSettings {
     public static final BooleanSetting OVERLAY_BUTTON_EXTERNAL_DOWNLOADER = new BooleanSetting("revanced_overlay_button_external_downloader", FALSE);
     public static final BooleanSetting OVERLAY_BUTTON_SPEED_DIALOG = new BooleanSetting("revanced_overlay_button_speed_dialog", FALSE);
     public static final BooleanSetting OVERLAY_BUTTON_PLAY_ALL = new BooleanSetting("revanced_overlay_button_play_all", FALSE);
-    public static final EnumSetting<PlaylistPrefixType> OVERLAY_BUTTON_PLAY_ALL_TYPE = new EnumSetting<>("revanced_overlay_button_play_all_type", PlaylistPrefixType.ALL_CONTENTS_WITH_TIME_DESCENDING, true);
-
+    public static final EnumSetting<PlaylistIdPrefix> OVERLAY_BUTTON_PLAY_ALL_TYPE = new EnumSetting<>("revanced_overlay_button_play_all_type", PlaylistIdPrefix.ALL_CONTENTS_WITH_TIME_DESCENDING);
     public static final BooleanSetting OVERLAY_BUTTON_WHITELIST = new BooleanSetting("revanced_overlay_button_whitelist", FALSE);
 
     // PreferenceScreen: Player - Seekbar

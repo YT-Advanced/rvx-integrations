@@ -2,17 +2,19 @@ package app.revanced.integrations.youtube.utils;
 
 import static app.revanced.integrations.shared.utils.ResourceUtils.getStringArray;
 import static app.revanced.integrations.shared.utils.StringRef.str;
-import static app.revanced.integrations.shared.utils.Utils.showToastShort;
 import static app.revanced.integrations.youtube.patches.video.PlaybackSpeedPatch.userSelectedPlaybackSpeed;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.media.AudioManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import app.revanced.integrations.shared.settings.IntegerSetting;
@@ -22,22 +24,49 @@ import app.revanced.integrations.youtube.patches.video.CustomPlaybackSpeedPatch;
 import app.revanced.integrations.youtube.settings.Settings;
 import app.revanced.integrations.youtube.settings.preference.ExternalDownloaderPlaylistPreference;
 import app.revanced.integrations.youtube.settings.preference.ExternalDownloaderVideoPreference;
+import app.revanced.integrations.youtube.shared.PlaylistIdPrefix;
 import app.revanced.integrations.youtube.shared.VideoInformation;
 
 @SuppressWarnings("unused")
 public class VideoUtils extends IntentUtils {
+    private static final String PLAYLIST_URL = "https://www.youtube.com/playlist?list=";
+    private static final String VIDEO_URL = "https://youtu.be/";
+    private static final String VIDEO_SCHEME_FORMAT = "vnd.youtube://%s?start=%d";
     private static final AtomicBoolean isExternalDownloaderLaunched = new AtomicBoolean(false);
 
-    public static void copyUrl(boolean withTimestamp) {
-        StringBuilder builder = new StringBuilder("https://youtu.be/");
-        builder.append(VideoInformation.getVideoId());
-        final long currentVideoTimeInSeconds = getVideoTimeinSeconds();
+    private static String getPlaylistUrl(String playlistId) {
+        return PLAYLIST_URL + playlistId;
+    }
+
+    private static String getVideoUrl(String videoId) {
+        return getVideoUrl(videoId, false);
+    }
+
+    private static String getVideoUrl(boolean withTimestamp) {
+        return getVideoUrl(VideoInformation.getVideoId(), withTimestamp);
+    }
+
+    private static String getVideoUrl(String videoId, boolean withTimestamp) {
+        StringBuilder builder = new StringBuilder(VIDEO_URL);
+        builder.append(videoId);
+        final long currentVideoTimeInSeconds = VideoInformation.getVideoTimeInSeconds();
         if (withTimestamp && currentVideoTimeInSeconds > 0) {
             builder.append("?t=");
             builder.append(currentVideoTimeInSeconds);
         }
+        return builder.toString();
+    }
 
-        setClipboard(builder.toString(), withTimestamp
+    private static String getVideoScheme() {
+        return getVideoScheme(VideoInformation.getVideoId());
+    }
+
+    private static String getVideoScheme(String videoId) {
+        return String.format(Locale.ENGLISH, VIDEO_SCHEME_FORMAT, videoId, VideoInformation.getVideoTimeInSeconds());
+    }
+
+    public static void copyUrl(boolean withTimestamp) {
+        setClipboard(getVideoUrl(withTimestamp), withTimestamp
                 ? str("revanced_share_copy_url_timestamp_success")
                 : str("revanced_share_copy_url_success")
         );
@@ -46,10 +75,6 @@ public class VideoUtils extends IntentUtils {
     public static void copyTimeStamp() {
         final String timeStamp = getTimeStamp(VideoInformation.getVideoTime());
         setClipboard(timeStamp, str("revanced_share_copy_timestamp_success", timeStamp));
-    }
-    
-    private static long getVideoTimeinSeconds() {
-        return VideoInformation.getVideoTime() / 1000;
     }
 
     public static void launchVideoExternalDownloader() {
@@ -64,8 +89,7 @@ public class VideoUtils extends IntentUtils {
             }
 
             isExternalDownloaderLaunched.compareAndSet(false, true);
-            final String content = String.format("https://youtu.be/%s", videoId);
-            launchExternalDownloader(content, downloaderPackageName);
+            launchExternalDownloader(getVideoUrl(videoId), downloaderPackageName);
         } catch (Exception ex) {
             Logger.printException(() -> "launchExternalDownloader failure", ex);
         } finally {
@@ -81,8 +105,7 @@ public class VideoUtils extends IntentUtils {
             }
 
             isExternalDownloaderLaunched.compareAndSet(false, true);
-            final String content = String.format("https://www.youtube.com/playlist?list=%s", playlistId);
-            launchExternalDownloader(content, downloaderPackageName);
+            launchExternalDownloader(getPlaylistUrl(playlistId), downloaderPackageName);
         } catch (Exception ex) {
             Logger.printException(() -> "launchPlaylistExternalDownloader failure", ex);
         } finally {
@@ -90,29 +113,35 @@ public class VideoUtils extends IntentUtils {
         }
     }
 
+    public static void openVideo() {
+        openVideo(VideoInformation.getVideoId());
+    }
+
+    public static void openVideo(@NonNull String videoId) {
+        openVideo(getVideoScheme(videoId), "");
+    }
+
+    public static void openVideo(@NonNull PlaylistIdPrefix prefixId) {
+        openVideo(getVideoScheme(), prefixId.prefixId);
+    }
+
     /**
      * Create playlist with all channel videos.
      */
-    public static void openVideo(boolean activated, @Nullable String prefixId) {
-        final String videoId = VideoInformation.getVideoId();
-        final long currentVideoTimeInSeconds = getVideoTimeinSeconds();
-        String baseUri = "vnd.youtube://" + videoId + "?start=" + currentVideoTimeInSeconds;
-        if (activated) {
+    public static void openVideo(@NonNull String videoScheme, @NonNull String prefixId) {
+        if (!TextUtils.isEmpty(prefixId)) {
             final String channelId = VideoInformation.getChannelId();
             // Channel id always starts with `UC` prefix
             if (!channelId.startsWith("UC")) {
                 showToastShort(str("revanced_overlay_button_play_all_not_available_toast"));
                 return;
             }
-            baseUri += "&list=" + prefixId + channelId.substring(2);
+            videoScheme += "&list=" + prefixId + channelId.substring(2);
         }
+        final String finalVideoScheme = videoScheme;
+        Logger.printInfo(() -> finalVideoScheme);
 
-        launchView(baseUri, getContext().getPackageName());
-    }
-
-    public static void openVideo(@NonNull String videoId) {
-        String baseUri = "vnd.youtube://" + videoId;
-        launchView(baseUri, getContext().getPackageName());
+        launchView(videoScheme, getContext().getPackageName());
     }
 
     /**
@@ -172,24 +201,6 @@ public class VideoUtils extends IntentUtils {
         } else {
             showPlaybackSpeedFlyoutMenu();
         }
-    }
-
-    public static long getVideoTime(String str) {
-        if (str == null || str.isEmpty())
-            return 0;
-
-        String[] timeFormat = str.split(":");
-        String[] secondAndMills = timeFormat[2].split("\\.");
-
-        String hours = timeFormat[0];
-        String minutes = timeFormat[1];
-        String second = secondAndMills[0];
-        String mills = secondAndMills[1];
-
-        return Long.parseLong(hours) * 60 * 60 * 1000
-                + Long.parseLong(minutes) * 60 * 1000
-                + Long.parseLong(second) * 1000
-                + Long.parseLong(mills);
     }
 
     public static String getFormattedQualityString(@Nullable String prefix) {

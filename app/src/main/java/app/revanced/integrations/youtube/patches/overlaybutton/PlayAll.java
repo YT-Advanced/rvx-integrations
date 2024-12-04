@@ -12,43 +12,17 @@ import app.revanced.integrations.youtube.utils.VideoUtils;
 @SuppressWarnings("unused")
 public class PlayAll extends BottomControlButton {
 
-    public enum PlaylistPrefixType {
-        // https://github.com/RobertWesner/YouTube-Play-All/blob/main/documentation/available-lists.md
-        ALL_CONTENTS_WITH_TIME_DESCENDING("UU"),
-        ALL_CONTENTS_WITH_POPULAR_DESCENDING("PU"),
-        VIDEOS_ONLY_WITH_TIME_DESCENDING("UULF"),
-        VIDEOS_ONLY_WITH_POPULAR_DESCENDING("UULP"),
-        SHORTS_ONLY_WITH_TIME_DESCENDING("UUSH"),
-        SHORTS_ONLY_WITH_POPULAR_DESCENDING("UUPS"),
-        LIVESTREAMS_ONLY_WITH_TIME_DESCENDING("UULV"),
-        LIVESTREAMS_ONLY_WITH_POPULAR_DESCENDING("UUPV"),
-        ALL_MEMBERSHIPS_CONTENTS("UUMO"),
-        MEMBERSHIPS_VIDEOS_ONLY("UUMF"),
-        MEMBERSHIPS_SHORTS_ONLY("UUMS"),
-        MEMBERSHIPS_LIVESTREAMS_ONLY("UUMV");
-
-        /**
-         * Prefix of playlist id.
-         */
-        final String prefixId;
-
-        PlaylistPrefixType(String prefixId) {
-            this.prefixId = prefixId;
-        }
-    }
-
     @Nullable
     private static PlayAll instance;
-    private static final PlaylistPrefixType CURRENT_TYPE = Settings.OVERLAY_BUTTON_PLAY_ALL_TYPE.get();
 
     public PlayAll(ViewGroup bottomControlsViewGroup) {
         super(
                 bottomControlsViewGroup,
                 "play_all_button",
                 Settings.OVERLAY_BUTTON_PLAY_ALL,
-                view -> VideoUtils.openVideo(true, CURRENT_TYPE.prefixId),
+                view -> VideoUtils.openVideo(Settings.OVERLAY_BUTTON_PLAY_ALL_TYPE.get()),
                 view -> {
-                    VideoUtils.openVideo(false, null);
+                    VideoUtils.openVideo();
                     return true;
                 }
         );
