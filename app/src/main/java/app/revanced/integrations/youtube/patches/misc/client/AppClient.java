@@ -289,15 +289,20 @@ public class AppClient {
          */
         public final String clientVersion;
 
-        ClientType(int id, 
-               @Nullable String make, 
-               String deviceModel, 
-               String clientVersion, 
-               @Nullable String osName,
-               String osVersion, 
-               Integer androidSdkVersion, 
-               String userAgent,
-               boolean canLogin
+        /**
+         * If the client can access the API logged in.
+         */
+        public final boolean canLogin;
+
+        ClientType(int id,
+                   @Nullable String make,
+                   String deviceModel,
+                   String clientVersion,
+                   @Nullable String osName,
+                   String osVersion,
+                   Integer androidSdkVersion,
+                   String userAgent,
+                   boolean canLogin
         ) {
             this.friendlyName = str("revanced_spoof_streaming_data_type_entry_" + name().toLowerCase());
             this.id = id;
