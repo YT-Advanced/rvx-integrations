@@ -76,7 +76,11 @@ public class SpoofStreamingDataSideEffectsPreference extends Preference {
 
         final String summaryTextKey;
         if (selectableClientTypes.contains(clientType)) {
-            summaryTextKey = "revanced_spoof_streaming_data_side_effects_" + clientType.name().toLowerCase();
+            if (clientType == ClientType.IOS && Settings.SPOOF_STREAMING_DATA_IOS_COMPATIBILITY.get()) {
+                summaryTextKey = "revanced_spoof_streaming_data_side_effects_ios_compatibility";
+            } else {
+                summaryTextKey = "revanced_spoof_streaming_data_side_effects_" + clientType.name().toLowerCase();
+            }
         } else {
             summaryTextKey = "revanced_spoof_streaming_data_side_effects_unknown";
         }

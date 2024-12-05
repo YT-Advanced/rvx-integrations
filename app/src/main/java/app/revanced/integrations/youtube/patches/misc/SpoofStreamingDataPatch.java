@@ -2,7 +2,6 @@ package app.revanced.integrations.youtube.patches.misc;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
@@ -179,15 +178,6 @@ public class SpoofStreamingDataPatch {
         }
 
         return videoFormat;
-    }
-
-    /**
-     * Injection point.
-     */
-    public static void syncLivestreamTime(TextView view) {
-        Utils.runOnMainThreadDelayed(() -> {
-            if (view != null) view.performClick();
-        }, 200);
     }
 
     public static final class ForceiOSAVCAvailability implements Setting.Availability {
