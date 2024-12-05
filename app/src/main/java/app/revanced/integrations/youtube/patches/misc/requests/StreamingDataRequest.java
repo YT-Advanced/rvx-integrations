@@ -114,6 +114,7 @@ public class StreamingDataRequest {
         Objects.requireNonNull(videoId);
         try {
             HttpURLConnection connection = PlayerRoutes.getPlayerResponseConnectionFromRoute(GET_LIVE_STREAM_RENDERER, clientType);
+            setHeader(connection, clientType, playerHeaders);
             String innerTubeBody = PlayerRoutes.createInnertubeBody(clientType, videoId);
             byte[] requestBody = innerTubeBody.getBytes(StandardCharsets.UTF_8);
             connection.setFixedLengthStreamingMode(requestBody.length);
@@ -160,11 +161,29 @@ public class StreamingDataRequest {
         return false;
     }
 
+    // Available only to logged in users.
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+
     private static final String[] REQUEST_HEADER_KEYS = {
-            "Authorization", // Available only to logged in users.
+            AUTHORIZATION_HEADER,
             "X-GOOG-API-FORMAT-VERSION",
             "X-Goog-Visitor-Id"
     };
+
+    private static void setHeader(HttpURLConnection connection, ClientType clientType,
+                                  Map<String, String> playerHeaders) {
+        if (playerHeaders != null) {
+            for (String key : REQUEST_HEADER_KEYS) {
+                if (!clientType.canLogin && key.equals(AUTHORIZATION_HEADER)) {
+                    continue;
+                }
+                String value = playerHeaders.get(key);
+                if (value != null) {
+                    connection.setRequestProperty(key, value);
+                }
+            }
+        }
+    }
 
     @Nullable
     private static HttpURLConnection send(ClientType clientType, String videoId,
@@ -182,12 +201,7 @@ public class StreamingDataRequest {
             connection.setConnectTimeout(HTTP_TIMEOUT_MILLISECONDS);
             connection.setReadTimeout(HTTP_TIMEOUT_MILLISECONDS);
 
-            for (String key : REQUEST_HEADER_KEYS) {
-                String value = playerHeaders.get(key);
-                if (value != null) {
-                    connection.setRequestProperty(key, value);
-                }
-            }
+            setHeader(connection, clientType, playerHeaders);
 
             String innerTubeBody = PlayerRoutes.createInnertubeBody(clientType, videoId);
             byte[] requestBody = innerTubeBody.getBytes(StandardCharsets.UTF_8);

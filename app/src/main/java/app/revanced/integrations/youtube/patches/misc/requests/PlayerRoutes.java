@@ -5,12 +5,15 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Objects;
 
 import app.revanced.integrations.shared.requests.Requester;
 import app.revanced.integrations.shared.requests.Route;
 import app.revanced.integrations.shared.utils.Logger;
+import app.revanced.integrations.shared.utils.Utils;
 import app.revanced.integrations.youtube.patches.misc.client.AppClient.ClientType;
 
+@SuppressWarnings("deprecation")
 public final class PlayerRoutes {
     /**
      * The base URL of requests of non-web clients to the InnerTube internal API.
@@ -57,8 +60,8 @@ public final class PlayerRoutes {
 
             JSONObject client = new JSONObject();
             client.put("clientName", clientType.name());
-            client.put("clientVersion", clientType.appVersion);
-            client.put("deviceModel", clientType.model);
+            client.put("clientVersion", clientType.clientVersion);
+            client.put("deviceModel", clientType.deviceModel);
             client.put("osVersion", clientType.osVersion);
             if (clientType.make != null) {
                 client.put("deviceMake", clientType.make);
@@ -69,6 +72,8 @@ public final class PlayerRoutes {
             if (clientType.androidSdkVersion != null) {
                 client.put("androidSdkVersion", clientType.androidSdkVersion.toString());
             }
+            String languageCode = Objects.requireNonNull(Utils.getContext()).getResources().getConfiguration().locale.getLanguage();
+            client.put("hl", languageCode);
 
             context.put("client", client);
 
