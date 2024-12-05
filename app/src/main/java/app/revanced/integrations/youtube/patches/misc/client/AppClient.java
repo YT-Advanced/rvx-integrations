@@ -6,29 +6,10 @@ import android.os.Build;
 
 import androidx.annotation.Nullable;
 
-import app.revanced.integrations.shared.utils.PackageUtils;
-
 public class AppClient {
 
-    // WEB
-    private static final String CLIENT_VERSION_WEB = "2.20240726.00.00";
-    private static final String DEVICE_MODEL_WEB = "Surface Book 3";
-    private static final String OS_VERSION_WEB = "10";
-    private static final String USER_AGENT_WEB = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:129.0)" +
-            " Gecko/20100101" +
-            " Firefox/129.0";
-
     // ANDROID
-    private static final String CLIENT_VERSION_ANDROID = PackageUtils.getVersionName();
-    private static final String DEVICE_MODEL_ANDROID = Build.MODEL;
     private static final String OS_NAME_ANDROID = "Android";
-    private static final String OS_VERSION_ANDROID = Build.VERSION.RELEASE;
-    private static final int ANDROID_SDK_VERSION_ANDROID = Build.VERSION.SDK_INT;
-    private static final String USER_AGENT_ANDROID = "com.google.android.youtube/" +
-            CLIENT_VERSION_ANDROID +
-            " (Linux; U; Android " +
-            OS_VERSION_ANDROID +
-            "; GB) gzip";
 
     // IOS
     /**
@@ -40,11 +21,11 @@ public class AppClient {
      * Store page of the YouTube app</a>, in the {@code What’s New} section.
      * </p>
      */
-    private static final String CLIENT_VERSION_IOS = "19.30.2";
+    private static final String CLIENT_VERSION_IOS = "19.47.7";
     private static final String DEVICE_MAKE_IOS = "Apple";
     /**
      * The device machine id for the iPhone XS Max (iPhone11,4), used to get 60fps.
-     * The device machine id for the iPhone 15 Pro Max (iPhone16,2), used to get HDR with AV1 hardware decoding.
+     * The device machine id for the iPhone 16 Pro Max (iPhone17,2), used to get HDR with AV1 hardware decoding.
      *
      * <p>
      * See <a href="https://gist.github.com/adamawolf/3048717">this GitHub Gist</a> for more
@@ -52,7 +33,7 @@ public class AppClient {
      * </p>
      */
     private static final String DEVICE_MODEL_IOS = DeviceHardwareSupport.allowAV1()
-            ? "iPhone16,2"
+            ? "iPhone17,2"
             : "iPhone11,4";
     private static final String OS_NAME_IOS = "iOS";
     /**
@@ -60,10 +41,10 @@ public class AppClient {
      * Using an invalid OS version will use the AVC codec.
      */
     private static final String OS_VERSION_IOS = DeviceHardwareSupport.allowVP9()
-            ? "17.7.21H16"
+            ? "18.1.1.22B91"
             : "13.7.17H35";
     private static final String USER_AGENT_VERSION_IOS = DeviceHardwareSupport.allowVP9()
-            ? "17_7"
+            ? "18_1_1"
             : "13_7";
     private static final String USER_AGENT_IOS = "com.google.ios.youtube/" +
             CLIENT_VERSION_IOS +
@@ -72,14 +53,6 @@ public class AppClient {
             "; U; CPU iOS " +
             USER_AGENT_VERSION_IOS +
             " like Mac OS X)";
-
-    // ANDROID ANDROID_CREATOR
-    private static final String CLIENT_VERSION_ANDROID_CREATOR = "24.14.10";
-    private static final String USER_AGENT_ANDROID_CREATOR = "com.google.android.apps.youtube.creator/" +
-            CLIENT_VERSION_ANDROID_CREATOR +
-            " (Linux; U; Android " +
-            OS_VERSION_ANDROID +
-            "; GB) gzip";
 
     // ANDROID VR
     /**
@@ -91,7 +64,7 @@ public class AppClient {
      * Store page of the YouTube app</a>, in the {@code Additional details} section.
      * </p>
      */
-    private static final String CLIENT_VERSION_ANDROID_VR = "1.56.21";
+    private static final String CLIENT_VERSION_ANDROID_VR = "1.60.19";
     /**
      * The device machine id for the Meta Quest 3, used to get opus codec with the Android VR client.
      *
@@ -119,7 +92,7 @@ public class AppClient {
             "; GB) gzip";
 
     // ANDROID UNPLUGGED
-    private static final String CLIENT_VERSION_ANDROID_UNPLUGGED = "8.16.0";
+    private static final String CLIENT_VERSION_ANDROID_UNPLUGGED = "8.47.0";
     /**
      * The device machine id for the Chromecast with Google TV 4K.
      *
@@ -137,41 +110,10 @@ public class AppClient {
             OS_VERSION_ANDROID_UNPLUGGED +
             "; GB) gzip";
 
-    // ANDROID TESTSUITE
-    private static final String CLIENT_VERSION_ANDROID_TESTSUITE = "1.9";
-    private static final String USER_AGENT_ANDROID_TESTSUITE = "com.google.android.youtube/" +
-            CLIENT_VERSION_ANDROID_TESTSUITE +
-            " (Linux; U; Android " +
-            OS_VERSION_ANDROID +
-            "; GB) gzip";
-
-    // TVHTML5 SIMPLY EMBEDDED PLAYER
-    private static final String CLIENT_VERSION_TVHTML5_SIMPLY_EMBEDDED_PLAYER = "2.0";
-
     private AppClient() {
     }
 
     public enum ClientType {
-        WEB(1,
-                null,
-                DEVICE_MODEL_WEB,
-                CLIENT_VERSION_WEB,
-                null,
-                OS_VERSION_WEB,
-                null,
-                USER_AGENT_WEB,
-                true
-        ),
-        ANDROID(3,
-                null,
-                DEVICE_MODEL_ANDROID,
-                CLIENT_VERSION_ANDROID,
-                OS_NAME_ANDROID,
-                OS_VERSION_ANDROID,
-                ANDROID_SDK_VERSION_ANDROID,
-                USER_AGENT_ANDROID,
-                true
-        ),
         IOS(5,
                 DEVICE_MAKE_IOS,
                 DEVICE_MODEL_IOS,
@@ -181,16 +123,6 @@ public class AppClient {
                 null,
                 USER_AGENT_IOS,
                 false
-        ),
-        ANDROID_CREATOR(14,
-                null,
-                DEVICE_MODEL_ANDROID,
-                CLIENT_VERSION_ANDROID_CREATOR,
-                OS_NAME_ANDROID,
-                OS_VERSION_ANDROID,
-                ANDROID_SDK_VERSION_ANDROID,
-                USER_AGENT_ANDROID_CREATOR,
-                true
         ),
         ANDROID_VR(28,
                 null,
@@ -211,36 +143,6 @@ public class AppClient {
                 ANDROID_SDK_VERSION_ANDROID_UNPLUGGED,
                 USER_AGENT_ANDROID_UNPLUGGED,
                 true
-        ),
-        ANDROID_TESTSUITE(30,
-                null,
-                DEVICE_MODEL_ANDROID,
-                CLIENT_VERSION_ANDROID_TESTSUITE,
-                OS_NAME_ANDROID,
-                OS_VERSION_ANDROID,
-                ANDROID_SDK_VERSION_ANDROID,
-                USER_AGENT_ANDROID_TESTSUITE,
-                false
-        ),
-        ANDROID_EMBEDDED_PLAYER(55,
-                null,
-                DEVICE_MODEL_ANDROID,
-                CLIENT_VERSION_ANDROID,
-                OS_NAME_ANDROID,
-                OS_VERSION_ANDROID,
-                ANDROID_SDK_VERSION_ANDROID,
-                USER_AGENT_ANDROID,
-                true
-        ),
-        TVHTML5_SIMPLY_EMBEDDED_PLAYER(85,
-                null,
-                DEVICE_MODEL_WEB,
-                CLIENT_VERSION_TVHTML5_SIMPLY_EMBEDDED_PLAYER,
-                null,
-                OS_VERSION_WEB,
-                null,
-                USER_AGENT_WEB,
-                false
         );
 
         public final String friendlyName;
