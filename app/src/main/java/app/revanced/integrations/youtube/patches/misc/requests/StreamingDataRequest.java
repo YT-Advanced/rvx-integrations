@@ -174,26 +174,26 @@ public class StreamingDataRequest {
             );
 
     private static ByteBuffer fetch(@NonNull String videoId, Map<String, String> playerHeaders) {
-        lastSpoofedClientType = null;
+        try {
+            lastSpoofedClientType = null;
 
-        // Retry with different client if empty response body is received.
-        for (ClientType clientType : CLIENT_ORDER_TO_USE) {
-            HttpURLConnection connection = send(clientType, videoId, playerHeaders);
+            // Retry with different client if empty response body is received.
+            for (ClientType clientType : CLIENT_ORDER_TO_USE) {
+                HttpURLConnection connection = send(clientType, videoId, playerHeaders);
 
-            // gzip encoding doesn't response with content length (-1),
-            // but empty response body does.
-            if (connection == null || connection.getContentLength() == 0)
-                continue;
-
-            try (
+                // gzip encoding doesn't response with content length (-1),
+                // but empty response body does.
+                if (connection == null || connection.getContentLength() == 0) {
+                    continue;
+                }
                 InputStream inputStream = new BufferedInputStream(connection.getInputStream());
-                ByteArrayOutputStream baos = new ByteArrayOutputStream()
-            ) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 byte[] buffer = new byte[8192];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) >= 0) {
                     baos.write(buffer, 0, bytesRead);
                 }
+                inputStream.close();
                 if (clientType == ClientType.IOS && liveStreams.check(buffer).isFiltered()) {
                     Logger.printDebug(() -> "Ignore IOS spoofing as it is a livestream (video: " + videoId + ")");
                     continue;
@@ -201,9 +201,9 @@ public class StreamingDataRequest {
                 lastSpoofedClientType = clientType;
 
                 return ByteBuffer.wrap(baos.toByteArray());
-            } catch (IOException ex) {
-                Logger.printException(() -> "Fetch failed while processing response data", ex);
             }
+        } catch (IOException ex) {
+            Logger.printException(() -> "Fetch failed while processing response data", ex);
         }
 
         handleConnectionError("Could not fetch any client streams", null);
