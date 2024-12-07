@@ -132,7 +132,7 @@ public class StreamingDataRequest {
             connection.setFixedLengthStreamingMode(requestBody.length);
             connection.getOutputStream().write(requestBody);
         } catch (IOException ex) {
-            handleConnectionError("Fetch livestreams temporarily not available: " + ex.getMessage(), ex);
+            handleConnectionError("Network error", ex);
         }
     }
 
@@ -184,21 +184,22 @@ public class StreamingDataRequest {
                     // gzip encoding doesn't response with content length (-1),
                     // but empty response body does.
                     if (connection.getContentLength() != 0) {
-                        try (InputStream inputStream = new BufferedInputStream(connection.getInputStream())) {
-                            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                                byte[] buffer = new byte[8192];
-                                int bytesRead;
-                                while ((bytesRead = inputStream.read(buffer)) >= 0) {
-                                    baos.write(buffer, 0, bytesRead);
-                                }
-                                if (clientType == ClientType.IOS && liveStreams.check(buffer).isFiltered()) {
-                                    Logger.printDebug(() -> "Ignore IOS spoofing as it is a livestream (video: " + videoId + ")");
-                                    continue;
-                                }
-                                lastSpoofedClientType = clientType;
-
-                                return ByteBuffer.wrap(baos.toByteArray());
+                        try (
+                            InputStream inputStream = new BufferedInputStream(connection.getInputStream());
+                            ByteArrayOutputStream baos = new ByteArrayOutputStream()
+                        ) {
+                            byte[] buffer = new byte[8192];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) >= 0) {
+                                baos.write(buffer, 0, bytesRead);
                             }
+                            if (clientType == ClientType.IOS && liveStreams.check(buffer).isFiltered()) {
+                                Logger.printDebug(() -> "Ignore IOS spoofing as it is a livestream (video: " + videoId + ")");
+                                continue;
+                            }
+                            lastSpoofedClientType = clientType;
+
+                            return ByteBuffer.wrap(baos.toByteArray());
                         }
                     }
                 } catch (IOException ex) {
