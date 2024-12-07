@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 
 import java.util.Arrays;
-import java.util.List;
 
 import app.revanced.integrations.shared.settings.Setting;
 import app.revanced.integrations.shared.utils.Utils;
@@ -65,24 +64,14 @@ public class SpoofStreamingDataSideEffectsPreference extends Preference {
         removeChangeListener();
     }
 
-    private static final List<ClientType> selectableClientTypes = Arrays.asList(
-            ClientType.IOS,
-            ClientType.ANDROID_VR,
-            ClientType.ANDROID_UNPLUGGED
-    );
-
     private void updateUI() {
         final ClientType clientType = Settings.SPOOF_STREAMING_DATA_TYPE.get();
 
         final String summaryTextKey;
-        if (selectableClientTypes.contains(clientType)) {
-            if (clientType == ClientType.IOS && Settings.SPOOF_STREAMING_DATA_IOS_COMPATIBILITY.get()) {
-                summaryTextKey = "revanced_spoof_streaming_data_side_effects_ios_compatibility";
-            } else {
-                summaryTextKey = "revanced_spoof_streaming_data_side_effects_" + clientType.name().toLowerCase();
-            }
+        if (clientType == ClientType.IOS && Settings.SPOOF_STREAMING_DATA_IOS_SKIP_LIVESTREAM_PLAYBACK.get()) {
+            summaryTextKey = "revanced_spoof_streaming_data_side_effects_ios_skip_livestream_playback";
         } else {
-            summaryTextKey = "revanced_spoof_streaming_data_side_effects_unknown";
+            summaryTextKey = "revanced_spoof_streaming_data_side_effects_" + clientType.name().toLowerCase();
         }
 
         setSummary(str(summaryTextKey));

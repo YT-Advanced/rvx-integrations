@@ -180,7 +180,7 @@ public class SpoofStreamingDataPatch {
         return videoFormat;
     }
 
-    public static final class ForceiOSAVCAvailability implements Setting.Availability {
+    public static final class iOSAvailability implements Setting.Availability {
         @Override
         public boolean isAvailable() {
             return Settings.SPOOF_STREAMING_DATA.get() && Settings.SPOOF_STREAMING_DATA_TYPE.get() == ClientType.IOS;

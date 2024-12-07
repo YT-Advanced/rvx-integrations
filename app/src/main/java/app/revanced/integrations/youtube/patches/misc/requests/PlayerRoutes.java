@@ -33,13 +33,6 @@ public final class PlayerRoutes {
                     "?fields=contents.singleColumnWatchNextResults.playlist.playlist"
     ).compile();
 
-    static final Route.CompiledRoute GET_LIVE_STREAM_RENDERER = new Route(
-            Route.Method.POST,
-            "player" +
-                    "?fields=playabilityStatus.status," +
-                    "videoDetails.isLiveContent"
-    ).compile();
-
     /**
      * TCP connection and HTTP read timeout
      */
