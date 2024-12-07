@@ -29,12 +29,7 @@ import app.revanced.integrations.youtube.patches.misc.client.AppClient.ClientTyp
 import app.revanced.integrations.youtube.settings.Settings;
 
 public class StreamingDataRequest {
-    private static final ClientType[] ALL_CLIENT_TYPES = {
-            ClientType.IOS,
-            ClientType.ANDROID_VR,
-            ClientType.ANDROID_UNPLUGGED,
-    };
-
+    private static final ClientType[] ALL_CLIENT_TYPES = ClientType.values();
     private static final ClientType[] CLIENT_ORDER_TO_USE;
 
     static {
@@ -188,7 +183,7 @@ public class StreamingDataRequest {
                 }
                 InputStream inputStream = new BufferedInputStream(connection.getInputStream());
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buffer = new byte[8192];
+                byte[] buffer = new byte[2048];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) >= 0) {
                     baos.write(buffer, 0, bytesRead);
